@@ -37,6 +37,7 @@ def rem_dubs_helper(partition):
     return [partition[0]] + rem_dubs_helper(partition[1:])
 
 
+
 def generate_tableaux(n):
     if n == 1:
         return Tableau([[1]])
@@ -50,6 +51,8 @@ def generate_tableaux(n):
                 elif i == 0 or len(tab.data[i-1]) > len(tab.data[i]):
                     ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
         return ans
+
+
 
 def tableaux_shape(n, partition):
     ans = []
@@ -66,26 +69,64 @@ def tableaux_shape(n, partition):
                 matching = True
     return ans
                 
-def print_tableaux(tableau):
-    for row in tableau:
-        print(row)
-    return
-
-def compare_tableaux(n, tableau1, tableau2):
-    for row_index in range(len(tableau1)):
-        if n in tableau1[row_index] and n in tableau2[row_index]:
-            return compare_tableaux(n-1, tableau1, tableau2)
-        elif n == tableau1[row_index][-1]:
-            return True
-        elif n == tableau2[row_index][-1]:
-            return False
-
 def sort_tableaux(n, tableaux):
     switched = True
     while switched:
         switched = False
         for i in range(len(tableaux) - 1):
-            if compare_tableaux(n, tableaux[i+1], tableaux[i]):
+            if tableaux[i] > tableaux[i+1]:
                 tableaux[i], tableaux[i+1] = tableaux[i+1], tableaux[i]
                 switched = True
     return
+
+
+
+
+class Tableau(object):
+    def __init__(self, data):
+        self.data = data
+        self.size = 0
+        for row in self.data:
+            self.size += len(row)
+
+    def __repr__(self):
+        s = ''
+        for row in self.data:
+            #s += (2*len(row) + 1) * '-' 
+            #s += "\n"
+            s += "|"
+            for col in row:
+                s+= str(col)
+                s+="|"
+            s += "\n"
+        return s
+    
+    def compare_helper(self, other, n):
+        for row_index in range(len(self.data)):
+            if n in self.data[row_index] and n in other.data[row_index]:
+                return self.compare_helper(other, n-1)
+            elif n in self.data[row_index]:
+                return True
+            elif n in other.data[row_index]:
+                return False
+
+    def __gt__(self, other):
+        return self.compare_helper(other, self.size)
+
+    def __eq__(self, other):
+        return self.data == other.data
+
+    def find(self, k):
+        for row in range(len(self.data)):
+            for col in range(len(self.data[row])):
+                if self.data[row][col] == k:
+                    return row, col
+        return "Not in Tableau"
+
+    def distance(self, k):
+        kRow, kCol = self.find(k)
+        kPlusOneRow, kPlusOneCol = self.find(k+1) 
+        return abs(kRow - kPlusOneRow) + abs(kCol - kPlusOneCol)+1
+
+    def is_standard(self):
+        return
