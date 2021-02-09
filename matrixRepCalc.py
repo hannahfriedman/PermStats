@@ -39,16 +39,16 @@ def rem_dubs_helper(partition):
 
 def generate_tableaux(n):
     if n == 1:
-        return [[[1]]]
+        return Tableau([[1]])
     else:
         prev_tab = generate_tableaux(n-1)
-        ans = [tab + [[n]] for tab in prev_tab]
+        ans = [tab.data + [[n]] for tab in prev_tab]
         for tab in prev_tab:
-            for i in range(0, len(tab)):
-                if len(tab) == 1:
-                    ans += [[tab[i] + [n]]]
-                elif i == 0 or len(tab[i-1]) > len(tab[i]):
-                    ans += [tab[0:i] + [tab[i] + [n]] + tab[i+1:]]
+            for i in range(0, tab.size):
+                if tab.size == 1:
+                    ans += [Tableau([tab.data[i] + [n]])]
+                elif i == 0 or len(tab.data[i-1]) > len(tab.data[i]):
+                    ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
         return ans
 
 def tableaux_shape(n, partition):
