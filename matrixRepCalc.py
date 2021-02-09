@@ -89,7 +89,3 @@ def sort_tableaux(n, tableaux):
                 tableaux[i], tableaux[i+1] = tableaux[i+1], tableaux[i]
                 switched = True
     return
-
-
-def 
-
