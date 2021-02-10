@@ -13,15 +13,16 @@ def matrix_rep(n):
             rep = np.zeros((len(shape), len(shape)))
             print(shape)
             for index in range(len(shape)):
-                rep[index, index] = 1/(shape[index].signed_distance(i))
-                switched = shape[index].switch(i)
+                tableau = Tableau(shape[index].data)
+                rep[index, index] = 1/(tableau.signed_distance(i))
+#                switched = tableau.switch(i)
 #               if switched.is_standard():
  #                   switched_index = 0
   #                  for j in range(len(shape)):
    #                     if shape[j] == switched:
     #                        switched_index = j
      #                       break
-      #              rep[switched_index][index] = math.sqrt(1 - (shape[index].signed_distance(i))^2)
+      #              rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))^2)
             representation.append(rep)
         rho["(" + str(i) + "," + str(i+1) + ")"] = representation
     return rho
