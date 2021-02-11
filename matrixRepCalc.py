@@ -1,9 +1,11 @@
 import numpy as np
 import math
+import copy
 
 
 def matrix_rep(n):
     partitions = generate_partitions(n)
+    rev_partitions = partitions.reverse()
     tableaux_by_shape = [tableaux_shape(n, partition) for partition in partitions]
     rho = {}
     for i in range(1,n):
@@ -15,14 +17,14 @@ def matrix_rep(n):
             for index in range(len(shape)):
                 tableau = Tableau(shape[index].data)
                 rep[index, index] = 1/(tableau.signed_distance(i))
-#                switched = tableau.switch(i)
-#               if switched.is_standard():
- #                   switched_index = 0
-  #                  for j in range(len(shape)):
-   #                     if shape[j] == switched:
-    #                        switched_index = j
-     #                       break
-      #              rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))^2)
+                switched = tableau.switch(i)
+                if switched.is_standard():
+                    switched_index = 0
+                    for j in range(len(shape)):
+                        if shape[j] == switched:
+                            switched_index = j
+                            break
+                    rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))**(-2))
             representation.append(rep)
         rho["(" + str(i) + "," + str(i+1) + ")"] = representation
     return rho
@@ -36,7 +38,7 @@ def generate_partitions(n):
     elif n == 0:
         return [[]]
     for x in range(1, n):
-        ans+=[[x] + part for part in generate_partitions(n-x)]
+        ans += [[x] + part for part in generate_partitions(n-x)]
     return remove_dubs(ans) + [[n]]
 
 def remove_dubs(partition):
@@ -60,13 +62,15 @@ def generate_tableaux(n):
         return [Tableau([[1]])]
     else:
         prev_tab = generate_tableaux(n-1)
-        ans = [Tableau(tab.data + [[n]]) for tab in prev_tab]
+        ans = []
         for tab in prev_tab:
             for i in range(len(tab.data)):
                 if tab.size == 1:
                     ans += [Tableau([tab.data[i] + [n]])]
                 elif i == 0 or len(tab.data[i-1]) > len(tab.data[i]):
                     ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
+        ans += [Tableau(tab.data + [[n]]) for tab in prev_tab]
+
         return ans
 
 
@@ -74,14 +78,15 @@ def generate_tableaux(n):
 def tableaux_shape(n, partition):
     ans = []
     tableaux = generate_tableaux(n)
+    matching = True
     for tab in tableaux:
         if len(tab.data) == len(partition):
             for row_index in range(len(tab.data)):
-                matching = True
                 if len(tab.data[row_index]) != partition[row_index]:
                     matching = False
             if matching:
                 ans += [tab]
+        matching = True
     return ans
                 
 def sort_tableaux(n, tableaux):
@@ -140,9 +145,9 @@ class Tableau(object):
 
     def signed_distance(self, k):
         k_row, k_col = self.find(k)
-        content_k = k_row - k_col
+        content_k = k_col - k_row
         k_plus_one_row, k_plus_one_col = self.find(k+1) 
-        content_k_plus_one = k_plus_one_row - k_plus_one_col
+        content_k_plus_one = k_plus_one_col - k_plus_one_row
         return  content_k_plus_one - content_k
 
     def is_standard(self):
@@ -159,7 +164,7 @@ class Tableau(object):
         return True
 
     def switch(self, k):
-        switched_tableau = Tableau(self.data)
+        switched_tableau = Tableau(copy.deepcopy(self.data))
         k_row, k_col = self.find(k)
         k_plus_one_row, k_plus_one_col = self.find(k+1)
         switched_tableau.data[k_row][k_col] = k+1
