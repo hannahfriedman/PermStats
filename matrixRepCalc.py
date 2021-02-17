@@ -88,7 +88,7 @@ def tableaux_shape(n, partition):
                 ans += [tab]
         matching = True
     return ans
-                
+      
 def sort_tableaux(n, tableaux):
     switched = True
     while switched:
@@ -106,8 +106,10 @@ class Tableau(object):
     def __init__(self, data):
         self.data = data
         self.size = 0
+        self.shape = []
         for row in self.data:
             self.size += len(row)
+            self.shape += [len(row)]
 
     def __repr__(self):
         s = ''
