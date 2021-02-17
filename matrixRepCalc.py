@@ -31,8 +31,11 @@ def matrix_rep(n):
 
 
 def generate_partitions(n):
+    '''
+    Generates all partitions of size n
+    Returns a list of lists, showing the size of each partition
+    '''
     ans = []
-    used = []
     if n == 1:
         return [[1]]
     elif n == 0:
@@ -42,22 +45,24 @@ def generate_partitions(n):
     return remove_dubs(ans) + [[n]]
 
 def remove_dubs(partition):
+    ''' 
+    Removes duplicates in a list or lists
+    Makes sure that any inner lists are sorted first (treats inner lists as multi-sets)
+    ''' 
     for part in partition:
         part.sort()
         part.reverse()
-    return rem_dubs_helper(partition)
-
-def rem_dubs_helper(partition):
-    if len(partition) == 1:
-        return partition
-    for i in range(1, len(partition)):
-        if partition[0] == partition[i]:
-            return rem_dubs_helper(partition[1:])
-    return [partition[0]] + rem_dubs_helper(partition[1:])
-
+    result = []
+    for part in partition:
+        if part not in result:
+            result.append(part)
+    return result
 
 
 def generate_tableaux(n):
+    '''
+    Generates all tableaux of a given size n
+    '''
     if n == 1:
         return [Tableau([[1]])]
     else:
@@ -65,10 +70,13 @@ def generate_tableaux(n):
         ans = []
         for tab in prev_tab:
             for i in range(len(tab.data)):
-                if tab.size == 1:
-                    ans += [Tableau([tab.data[i] + [n]])]
-                elif i == 0 or len(tab.data[i-1]) > len(tab.data[i]):
+        # Aldrin: this first if statement doesn't seem necessary so it is removed for now
+                # if tab.size == 1: 
+                    # ans += [Tableau([tab.data[i] + [n]])]
+        # adds n to end of row if allowed
+                if i == 0 or len(tab.data[i]) < len(tab.data[i-1]):
                     ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
+        # adds n as a new row
         ans += [Tableau(tab.data + [[n]]) for tab in prev_tab]
 
         return ans
@@ -76,17 +84,14 @@ def generate_tableaux(n):
 
 
 def tableaux_shape(n, partition):
+    '''
+    Generates all tableaux of size n, that fit a given partition
+    '''
     ans = []
-    tableaux = generate_tableaux(n)
-    matching = True
-    for tab in tableaux:
-        if len(tab.data) == len(partition):
-            for row_index in range(len(tab.data)):
-                if len(tab.data[row_index]) != partition[row_index]:
-                    matching = False
-            if matching:
-                ans += [tab]
-        matching = True
+    tableaux_list = generate_tableaux(n)
+    for tab in tableaux_list:
+        if tab.shape == partition:
+            ans += [tab]
     return ans
       
 def sort_tableaux(n, tableaux):
