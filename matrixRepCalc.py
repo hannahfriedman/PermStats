@@ -1,4 +1,6 @@
 import numpy as np
+from numpy.linalg import matrix_power
+#from numpy.linalg import matmul
 import math
 import copy
 
@@ -13,7 +15,6 @@ def matrix_rep(n):
         for shape in tableaux_by_shape:
             sort_tableaux(n, shape)
             rep = np.zeros((len(shape), len(shape)))
-            print(shape)
             for index in range(len(shape)):
                 tableau = Tableau(shape[index].data)
                 rep[index, index] = 1/(tableau.signed_distance(i))
@@ -29,6 +30,32 @@ def matrix_rep(n):
         rho["(" + str(i) + "," + str(i+1) + ")"] = representation
     return rho
 
+def test_matrices(n):
+    rho = matrix_rep(n)
+    for i in range(1, n):
+        for mat in rho["(" + str(i) + "," + str(i+1) + ")"]:
+            print(matrix_power(mat, 2))
+    print(40*"-")
+    if n >= 4:
+        for i in range(1, n-2):
+            for j in range(len(rho["(" + str(i) + "," + str(i+1) + ")"])):
+                mat1 = rho["(" + str(i) + "," + str(i+1) + ")"][j]
+                mat2 = rho["(" + str(i+2) + "," + str(i+3) + ")"][j]
+                #print(np.matmul(mat1, mat2))
+                #print(np.matmul(mat2, mat1))
+                print(np.matmul(mat1, mat2) == np.matmul(mat2, mat1))
+    print(40*"-")
+    if n > 2:
+        for i in range(1, n-1):
+            for j in range(len(rho["(" + str(i) + "," + str(i+1) + ")"])):
+                mat1 = rho["(" + str(i) + "," + str(i+1) + ")"][j]
+                mat2 = rho["(" + str(i+1) + "," + str(i+2) + ")"][j]
+                LHS = np.matmul(np.matmul(mat1, mat2), mat1)
+                RHS = np.matmul(np.matmul(mat2, mat1), mat2)
+                print(LHS)
+                print(RHS)
+                #print(np.matmul(mat1, mat2) == np.matmul(mat2, mat1))
+    return 
 
 def generate_partitions(n):
     '''
