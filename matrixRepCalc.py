@@ -1,11 +1,27 @@
 import numpy as np
 from numpy.linalg import matrix_power
-#from numpy.linalg import matmul
 import math
 import copy
 
+def DTF(n, f):
+    """
+    n--int n in S_n
+    f--dict function from S_n to Z
+    """
+    return
 
 def matrix_rep(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the elements of S_n to their orthogonal matrix representations 
+    """
+    return
+
+def matrix_rep_gen(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the generators of S_n to their orthogonal matrix representations
+    """
     partitions = generate_partitions(n)
     rev_partitions = partitions.reverse()
     tableaux_by_shape = [tableaux_shape(n, partition) for partition in partitions]
