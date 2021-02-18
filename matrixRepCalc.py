@@ -3,6 +3,9 @@ from numpy.linalg import matrix_power
 import math
 import copy
 from Tableau import Tableau
+from permutation import Permutation
+#Docs for Permutation class: 
+#https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
 def fac(n):
     if n == 0:
@@ -22,6 +25,9 @@ def matrix_rep(n):
     n--int n in S_n
     returns a dict that maps the elements of S_n to their orthogonal matrix representations 
     """
+    rho_gen = matrix_rep_gen(n)
+    sn = Permutation.group(n)
+
     return
 
 def matrix_rep_gen(n):
@@ -50,8 +56,9 @@ def matrix_rep_gen(n):
                             break
                     rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))**(-2))
             representation.append(rep)
-        rho["(" + str(i) + "," + str(i+1) + ")"] = representation
+        rho[Permutation.cycle(i, i+1)] = representation
     return rho
+
 
 def test_matrices(n):
     rho = matrix_rep(n)
