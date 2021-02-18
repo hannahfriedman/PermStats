@@ -27,8 +27,11 @@ def matrix_rep(n):
     """
     rho_gen = matrix_rep_gen(n)
     sn = Permutation.group(n)
-
-    return
+    print(next(sn))
+    print(next(sn))
+    print(next(sn))
+    print(next(sn))
+    return 
 
 def matrix_rep_gen(n):
     """
