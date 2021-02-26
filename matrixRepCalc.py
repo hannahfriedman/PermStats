@@ -23,15 +23,32 @@ def DTF(n, f):
 def matrix_rep(n):
     """
     n--int n in S_n
-    returns a dict that maps the elements of S_n to their orthogonal matrix representations 
+    returns a dict that maps the elements of S_n to their orthogonal matrix representations
+    With help from formulas obtained in: https://math.stackexchange.com/questions/3420570/writing-permutations-as-products-of-adjacent-transposition 
     """
     rho_gen = matrix_rep_gen(n)
     rho = rho_gen
-    rho_updated = rho
     nfac = fac(n)
     sn = Permutation.group(n)
-    print(Permutation.cycle(3,1)*Permutation.cycle(1,6)*Permutation.cycle(6,4))
     
+    # Calcultes the matrix representation for all 2-cycles
+    for diff in range(2, n):
+        for startVal in range(1, n - diff + 1):
+            endVal = startVal + diff
+            permutation = Permutation.cycle(startVal, endVal)
+            perm_factor1 = Permutation.cycle(endVal - 1, endVal)
+            perm_factor2 = Permutation.cycle(startVal, endVal-1)
+            matrix_factor1 = rho[perm_factor1]
+            matrix_factor2 = rho[perm_factor2]
+            matrix_rep = [np.matmul(np.matmul(matrix_factor1[i], 
+                                    matrix_factor2[i]), 
+                                    matrix_factor1[i])
+                                    for i in range(len(matrix_factor1))]
+            rho[permutation] = matrix_rep
+    
+    # Matrix representation for the rest
+    return rho
+
         
 
 def matrix_rep_gen(n):
