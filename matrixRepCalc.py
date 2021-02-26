@@ -26,12 +26,25 @@ def matrix_rep(n):
     returns a dict that maps the elements of S_n to their orthogonal matrix representations 
     """
     rho_gen = matrix_rep_gen(n)
+    rho = rho_gen
+    rho_updated = rho
+    nfac = fac(n)
     sn = Permutation.group(n)
-    print(next(sn))
-    print(next(sn))
-    print(next(sn))
-    print(next(sn))
-    return 
+    while len(rho) < nfac:
+        for p in rho:
+            matrix_rep_helper(rho_updated, rho_gen, p)
+        rho = rho_updated
+    return rho
+
+def matrix_rep_helper(rho, rho_gen, p):
+    for gen in rho_gen:
+        if p.__mul__(gen) not in rho:
+            val = []
+            for i in range(len(rho_gen[gen])):
+                val.append(np.matmul(rho[p][i], rho_gen[gen][i]))
+            rho[p.__mul__(gen)] = val
+            #[np.matmul(rho[p][i], rho_gen[gen][i]) for i in range(len(rho_gen[gen][i]))]
+        
 
 def matrix_rep_gen(n):
     """
