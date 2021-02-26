@@ -131,9 +131,6 @@ def sort_tableaux(n, tableaux):
                 switched = True
     return
 
-
-
-
 class Tableau(object):
     def __init__(self, data):
         self.data = data
