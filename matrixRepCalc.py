@@ -30,20 +30,8 @@ def matrix_rep(n):
     rho_updated = rho
     nfac = fac(n)
     sn = Permutation.group(n)
-    while len(rho) < nfac:
-        for p in rho:
-            matrix_rep_helper(rho_updated, rho_gen, p)
-        rho = rho_updated
-    return rho
-
-def matrix_rep_helper(rho, rho_gen, p):
-    for gen in rho_gen:
-        if p.__mul__(gen) not in rho:
-            val = []
-            for i in range(len(rho_gen[gen])):
-                val.append(np.matmul(rho[p][i], rho_gen[gen][i]))
-            rho[p.__mul__(gen)] = val
-            #[np.matmul(rho[p][i], rho_gen[gen][i]) for i in range(len(rho_gen[gen][i]))]
+    print(Permutation.cycle(3,1)*Permutation.cycle(1,6)*Permutation.cycle(6,4))
+    
         
 
 def matrix_rep_gen(n):
