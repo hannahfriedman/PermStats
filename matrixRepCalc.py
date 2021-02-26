@@ -1,11 +1,44 @@
 import numpy as np
 from numpy.linalg import matrix_power
-#from numpy.linalg import matmul
 import math
 import copy
+from Tableau import Tableau
+from permutation import Permutation
+#Docs for Permutation class: 
+#https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
+def fac(n):
+    if n == 0:
+        return 1
+    else:
+        return n*fac(n-1)
+
+def DTF(n, f):
+    """
+    n--int n in S_n
+    f--dict function from S_n to Z
+    """
+    return
 
 def matrix_rep(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the elements of S_n to their orthogonal matrix representations 
+    """
+    rho_gen = matrix_rep_gen(n)
+    rho = rho_gen
+    rho_updated = rho
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    print(Permutation.cycle(3,1)*Permutation.cycle(1,6)*Permutation.cycle(6,4))
+    
+        
+
+def matrix_rep_gen(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the generators of S_n to their orthogonal matrix representations
+    """
     partitions = generate_partitions(n)
     rev_partitions = partitions.reverse()
     tableaux_by_shape = [tableaux_shape(n, partition) for partition in partitions]
@@ -27,8 +60,9 @@ def matrix_rep(n):
                             break
                     rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))**(-2))
             representation.append(rep)
-        rho["(" + str(i) + "," + str(i+1) + ")"] = representation
+        rho[Permutation.cycle(i, i+1)] = representation
     return rho
+
 
 def test_matrices(n):
     rho = matrix_rep(n)
@@ -73,7 +107,7 @@ def generate_partitions(n):
 
 def remove_dubs(partition):
     ''' 
-    Removes duplicates in a list or lists
+    Removes duplicates in a list of lists
     Makes sure that any inner lists are sorted first (treats inner lists as multi-sets)
     ''' 
     for part in partition:
@@ -131,73 +165,3 @@ def sort_tableaux(n, tableaux):
                 switched = True
     return
 
-class Tableau(object):
-    def __init__(self, data):
-        self.data = data
-        self.size = 0
-        self.shape = []
-        for row in self.data:
-            self.size += len(row)
-            self.shape += [len(row)]
-
-    def __repr__(self):
-        s = ''
-        for row in self.data:
-            #s += (2*len(row) + 1) * '-' 
-            #s += "\n"
-            s += "|"
-            for col in row:
-                s+= str(col)
-                s+="|"
-            s += "\n"
-        return s
-    
-    def compare_helper(self, other, n):
-        for row_index in range(len(self.data)):
-            if n in self.data[row_index] and n in other.data[row_index]:
-                return self.compare_helper(other, n-1)
-            elif n in self.data[row_index]:
-                return True
-            elif n in other.data[row_index]:
-                return False
-
-    def __gt__(self, other):
-        return self.compare_helper(other, self.size)
-
-    def __eq__(self, other):
-        return self.data == other.data
-
-    def find(self, k):
-        for row in range(len(self.data)):
-            for col in range(len(self.data[row])):
-                if self.data[row][col] == k:
-                    return row, col
-        return "Not in Tableau"
-
-    def signed_distance(self, k):
-        k_row, k_col = self.find(k)
-        content_k = k_col - k_row
-        k_plus_one_row, k_plus_one_col = self.find(k+1) 
-        content_k_plus_one = k_plus_one_col - k_plus_one_row
-        return  content_k_plus_one - content_k
-
-    def is_standard(self):
-        for row in range(len(self.data)-1):
-            for i in range(len(self.data[row+1])):
-                if self.data[row][i] > self.data[row+1][i]:
-                    return False
-            for i in range(len(self.data[row])-1):
-                if self.data[row][i] > self.data[row][i+1]:
-                    return False
-        for i in range(len(self.data[-1])-1):
-            if self.data[-1][i] > self.data[-1][i+1]:
-                    return False
-        return True
-
-    def switch(self, k):
-        switched_tableau = Tableau(copy.deepcopy(self.data))
-        k_row, k_col = self.find(k)
-        k_plus_one_row, k_plus_one_col = self.find(k+1)
-        switched_tableau.data[k_row][k_col] = k+1
-        switched_tableau.data[k_plus_one_row][k_plus_one_col] = k
-        return switched_tableau
