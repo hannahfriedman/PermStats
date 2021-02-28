@@ -23,13 +23,57 @@ def DTF(n, f):
 def matrix_rep(n):
     """
     n--int n in S_n
-    returns a dict that maps the elements of S_n to their orthogonal matrix representations
+    returns a dict that maps the 2-cycles of S_n to their orthogonal matrix representations
+    """
+    rho_gen = matrix_rep_gen(n)
+    rho = {}
+    sn = factor_sn(n)
+    for perm in sn:
+        key = Permutation.cycle()
+        val = []
+        for mat in rho_gen[Permutation.cycle(1,2)]:
+            val.append(matrix_power(mat, 2))
+        for transposition in perm:
+            if transposition != Permutation.cycle():
+                key *= transposition
+                for i in range(len(val)):
+                    val[i] = np.matmul(val[i], rho_gen[transposition][i])
+        rho[key] = val
+    return rho
+
+
+def factor_sn(n):
+    """
+    n--int n in S_n
+    returns a list of lists of factorizations of all elements of Sn
+    """
+    if n == 2:
+        return [[Permutation.cycle()], [Permutation.cycle(1,2)]]
+    else:
+        sn_minus_one = factor_sn(n-1)
+        sn = sn_minus_one
+        prev_coset = sn_minus_one
+        curr_coset = []
+        for i in range(1, n):
+            for perm in prev_coset:
+                newPerm = perm + [Permutation.cycle(n-i,n-i+1)]
+                curr_coset.append(newPerm)
+            sn = sn + curr_coset
+            prev_coset = curr_coset
+            curr_coset = []
+        return sn
+
+
+
+def matrix_rep_transpositions(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the 2-cycles of S_n to their orthogonal matrix representations
     With help from formulas obtained in: https://math.stackexchange.com/questions/3420570/writing-permutations-as-products-of-adjacent-transposition 
     """
     rho_gen = matrix_rep_gen(n)
     rho = rho_gen
     nfac = fac(n)
-    sn = Permutation.group(n)
     
     # Calcultes the matrix representation for all 2-cycles
     for diff in range(2, n):
