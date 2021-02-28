@@ -13,12 +13,31 @@ def fac(n):
     else:
         return n*fac(n-1)
 
-def DTF(n, f):
+def DFT_length(n):
     """
     n--int n in S_n
     f--dict function from S_n to Z
     """
-    return
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        length = perm.inversions()
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(length*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], length*rho[perm][i])
+    for mat in dft:
+        for row in range(mat.shape[0]):
+            for col in range(mat.shape[1]):
+                if abs(mat[row, col]) <= 10**-10:
+                    print(mat[row,col])
+                    mat[row,col] = 0
+    return dft
 
 def matrix_rep(n):
     """
