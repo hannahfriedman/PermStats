@@ -3,6 +3,7 @@ from numpy.linalg import matrix_power
 import math
 import copy
 from Tableau import Tableau
+from excedances import count_excedances
 from permutation import Permutation
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
@@ -31,11 +32,34 @@ def DFT_length(n):
         else:
             for i in range(len(rho[perm])):
                 dft[i] = np.add(dft[i], length*rho[perm][i])
+    return adjust_zeros(dft)
+
+def DFT_excedances(n):
+    """
+    n--int n in S_n
+    f--dict function from S_n to Z
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        excedances = count_excedances(perm, n)
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(excedances*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], excedances*rho[perm][i])
+    
+    return adjust_zeros(dft)
+
+def adjust_zeros(dft):
     for mat in dft:
         for row in range(mat.shape[0]):
             for col in range(mat.shape[1]):
                 if abs(mat[row, col]) <= 10**-10:
-                    print(mat[row,col])
                     mat[row,col] = 0
     return dft
 

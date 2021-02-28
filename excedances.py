@@ -2,7 +2,12 @@ from permutation import Permutation
 import numpy as np
 import numpy.linalg as la
 import math
-from matrixRepCalc import fac
+
+def fac(n):
+    if n == 0:
+        return 1
+    else:
+        return n*fac(n-1)
 
 def generate_matrix(n):
     perms = Permutation.group(n)
@@ -21,6 +26,13 @@ def generate_matrix(n):
     #for perm in permList:
     #    print(perm.__str__())
     return mat
+
+def count_excedances(perm, n):
+    count = 0
+    for i in range(1, n+1):
+        if i < perm(i):
+            count += 1
+    return count
 
 def f(n):
     mat = generate_matrix(n)
