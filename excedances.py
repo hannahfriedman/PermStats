@@ -2,6 +2,7 @@ from permutation import Permutation
 import numpy as np
 import numpy.linalg as la
 import math
+from wij import w_ij
 
 def fac(n):
     if n == 0:
@@ -33,6 +34,14 @@ def count_excedances(perm, n):
         if i < perm(i):
             count += 1
     return count
+
+def count_excedances_wij(perm, n):
+    count = 0
+    for i in range(1, n+1):
+        for j in range(i+1, n+1):
+            count+= w_ij(perm, i, j)
+    return count
+
 
 def f(n):
     mat = generate_matrix(n)
