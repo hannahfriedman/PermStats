@@ -5,6 +5,7 @@ import copy
 from Tableau import Tableau
 from excedances import count_excedances
 from permutation import Permutation
+from majorIndex import calc_major_index
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
@@ -17,7 +18,6 @@ def fac(n):
 def DFT_length(n):
     """
     n--int n in S_n
-    f--dict function from S_n to Z
     """
     nfac = fac(n)
     sn = Permutation.group(n)
@@ -37,7 +37,6 @@ def DFT_length(n):
 def DFT_excedances(n):
     """
     n--int n in S_n
-    f--dict function from S_n to Z
     """
     nfac = fac(n)
     sn = Permutation.group(n)
@@ -52,6 +51,27 @@ def DFT_excedances(n):
         else:
             for i in range(len(rho[perm])):
                 dft[i] = np.add(dft[i], excedances*rho[perm][i])
+
+    return adjust_zeros(dft)
+
+
+def DFT_major_index(n):
+    """
+    n--int n in S_n
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        major_index = calc_major_index(perm, n)
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(major_index*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], major_index*rho[perm][i])
 
     return adjust_zeros(dft)
 
