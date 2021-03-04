@@ -52,7 +52,7 @@ def DFT_excedances(n):
         else:
             for i in range(len(rho[perm])):
                 dft[i] = np.add(dft[i], excedances*rho[perm][i])
-    
+
     return adjust_zeros(dft)
 
 def adjust_zeros(dft):
@@ -144,7 +144,8 @@ def matrix_rep_gen(n):
     returns a dict that maps the generators of S_n to their orthogonal matrix representations
     """
     partitions = generate_partitions(n)
-    rev_partitions = partitions.reverse()
+    partitions.reverse()
+    #print(partitions)
     tableaux_by_shape = [tableaux_shape(n, partition) for partition in partitions]
     rho = {}
     for i in range(1,n):
