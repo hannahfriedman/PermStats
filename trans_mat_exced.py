@@ -3,22 +3,18 @@ from matrixRepCalc import fac
 from matrixRepCalc import adjust_zeros
 from scipy.linalg import block_diag
 from excedances import count_excedances
-from regular_rep import matlab_syntax
+from excedances import total_exced
+from misc import matlab_syntax
 import numpy as np
 import math
 from permutation import Permutation
 
 
-#To do: Replace DFT with normalized function and implement transition matrix function
+#To do: we care about the matrix phi* m^n phi
 
 
 
-def total_exced(n):
-    sn = Permutation.group(n)
-    count = 0
-    for sigma in sn:
-        count += count_excedances(sigma, n)
-    return count
+
 
 def normalized_DFT_excedances(n):
     """
@@ -74,16 +70,19 @@ def transition_matrix_exced(n):
     dft = normalized_DFT_excedances(n)
     m = generate_M_exced(dft)
     phi_ = phi(n)
-    phi_star = np.transpose(phi_)
+    phi_star = np.linalg.inv(phi_)
+    print(m)
     return adjust_zeros([np.matmul(phi_star, np.matmul(m, phi_))])[0]
 
 
 def __main__():
     trans_mat = transition_matrix_exced(3)
-    trans_mat = transition_matrix_exced(4)
-    trans_mat = transition_matrix_exced(5)
+    trans_mat1 = transition_matrix_exced(4)
+    #trans_mat2 = transition_matrix_exced(5)
     #print(trans_mat)
-    #print(matlab_syntax(trans_mat))
+    #print(trans_mat1)
+    #print(trans_mat2)
+    #print(matlab_syntax(trans_mat2))
 
 __main__()
 

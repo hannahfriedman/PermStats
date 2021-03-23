@@ -6,6 +6,8 @@ from Tableau import Tableau
 from excedances import count_excedances
 from permutation import Permutation
 from majorIndex import calc_major_index
+from misc import matlab_syntax
+
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
@@ -290,3 +292,7 @@ def sort_tableaux(n, tableaux):
                 switched = True
     return
 
+def __main__():
+    print(DFT_excedances(5))
+
+__main__()

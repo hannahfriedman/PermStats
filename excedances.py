@@ -88,8 +88,10 @@ def count_excedances_wij(perm, n):
             count+= w_ij(perm, i, j)
     return count
 
-
-def f(n):
-    mat = mega_matrix(n)
-    print(la.matrix_rank(mat))
+def total_exced(n):
+    sn = Permutation.group(n)
+    count = 0
+    for sigma in sn:
+        count += count_excedances(sigma, n)
+    return count
 

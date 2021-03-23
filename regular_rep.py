@@ -2,6 +2,7 @@ from permutation import Permutation
 import numpy as np
 from excedances import count_excedances
 from majorIndex import calc_major_index
+from misc import matlab_syntax
 
 # Excedance Transition Matrix S3 has eigenvaluse 6 with eigenvector all 1s, rank = 5
 
@@ -47,32 +48,7 @@ def transition_major_index(n):
         major_index_total += major_index
     return [trans_mat, major_index_total]
 
-def wolfram_syntax(mat):
-    string = "{"
-    for row in range(len(mat)):
-        string+="{"
-        for col in range(len(mat[0])-1):
-            string += str(mat[row, col])
-            string += ","
-        string += str(mat[row, len(mat[0])-1])
-        if row == len(mat) - 1:
-            string += "}"
-        else:
-            string += "},"
-    string+= "}"
-    print(string)
 
-def matlab_syntax(mat):
-    string = "["
-    for row in range(len(mat)):
-        for col in range(len(mat)):
-            string += " "
-            string += str(mat[row, col])
-        if row == len(mat) - 1:
-            string += "]"
-        else:
-            string += ";"
-    print(string)
 
 
 
