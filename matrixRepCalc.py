@@ -7,6 +7,7 @@ from excedances import count_excedances
 from permutation import Permutation
 from majorIndex import calc_major_index
 from misc import matlab_syntax
+from wij import w_ij
 
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
@@ -74,6 +75,26 @@ def DFT_major_index(n):
         else:
             for i in range(len(rho[perm])):
                 dft[i] = np.add(dft[i], major_index*rho[perm][i])
+
+    return adjust_zeros(dft)
+
+def DFT_w_ij(n, i, j):
+    """
+    n--int n in S_n
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        wij = w_ij(perm, j, i)
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(wij*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], wij*rho[perm][i])
 
     return adjust_zeros(dft)
 
@@ -293,6 +314,13 @@ def sort_tableaux(n, tableaux):
     return
 
 def __main__():
-    print(DFT_excedances(5))
+    """
+    rho = matrix_rep(3)
+    print(rho)
+    sn = Permutation.group(3)
+    for sigma in sn:
+    print(rho[sigma][1])"""
+    for arr in DFT_w_ij(5, 3,4):
+        print(arr)
 
 __main__()
