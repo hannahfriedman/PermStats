@@ -1,3 +1,4 @@
+from permutation import Permutation
 def wolfram_syntax(mat):
     string = "{"
     for row in range(len(mat)):
@@ -24,3 +25,4 @@ def matlab_syntax(mat):
         else:
             string += ";"
     print(string)
+
