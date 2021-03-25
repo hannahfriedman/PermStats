@@ -320,7 +320,7 @@ def __main__():
     sn = Permutation.group(3)
     for sigma in sn:
     print(rho[sigma][1])"""
-    for arr in DFT_w_ij(5, 3,4):
+    for arr in DFT_w_ij(5, 5,5):
         print(arr)
 
 __main__()

@@ -44,7 +44,7 @@ def plot_var_dist(mat, max_pow):
     plt.show()
     return powers
 
-def plot_var_dist(mat, mat1, max_pow):
+def plot_var_dist2(mat, mat1, max_pow):
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     plt.yscale('log')
@@ -61,24 +61,24 @@ def plot_var_dist(mat, mat1, max_pow):
 
 def __main__():
     #Excedances:
-    #mat = DFT_excedances(5)[2]
-    #mat = normalize(mat, total_exced(5))
-    #plot_var_dist(mat, 20)
+    mat = DFT_excedances(5)[2]
+    mat = normalize(mat, total_exced(5))
+    plot_var_dist(mat, 20)
     #print(DFT_excedances(6)) -- nonzero matrix index is 4
 
     #Major Index:
-    #mat = DFT_major_index(5)[2]
-    #mat = normalize(mat, total_exced(5))
-    #mat1 = DFT_major_index(5)[4]
-    #mat1 = normalize(mat1, total_exced(5))
-    #plot_var_dist(mat, mat1, 13)
+    mat = DFT_major_index(5)[2]
+    mat = normalize(mat, total_exced(5))
+    mat1 = DFT_major_index(5)[4]
+    mat1 = normalize(mat1, total_exced(5))
+    plot_var_dist2(mat, mat1, 13)
 
     #Length:
     mat = DFT_length(6)[4]
     mat = normalize(mat, total_length(6))
     mat1 = DFT_length(6)[6]
     mat1 = normalize(mat1, total_length(6))
-    plot_var_dist(mat, mat1, 20)
+    plot_var_dist2(mat, mat1, 20)
 
 
 
