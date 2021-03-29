@@ -1,6 +1,7 @@
 from permutation import Permutation
 import numpy as np
 import math
+from misc import matlab_syntax
 from matrixRepCalc import adjust_zeros
 
 
@@ -28,4 +29,4 @@ def print_images():
     p = rho(3)
     cob = cob_s_three()
     for sigma in sn:
-        print(adjust_zeros([np.matmul(cob, np.matmul(p[sigma], np.transpose(cob)))])[0])
+        print(matlab_syntax(adjust_zeros([np.matmul(cob, np.matmul(p[sigma], np.transpose(cob)))])[0]))

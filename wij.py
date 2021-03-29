@@ -10,6 +10,7 @@ def w_ij(sigma, j, i):
     else:
         return 0
 
+
 def w_ij_kl(sigma, i, j, k, l):
     """
     input: permutation

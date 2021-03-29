@@ -86,16 +86,15 @@ def DFT_w_ij(n, i, j):
     sn = Permutation.group(n)
     dft = []
     rho = matrix_rep(n)
-    for i in range(nfac):
+    for index in range(nfac):
         perm = next(sn)
         wij = w_ij(perm, j, i)
-        if i == 0:
+        if index == 0:
             for mat in rho[perm]:
                 dft.append(wij*mat)
         else:
-            for i in range(len(rho[perm])):
-                dft[i] = np.add(dft[i], wij*rho[perm][i])
-
+            for rep_index in range(len(rho[perm])):
+                dft[rep_index] = np.add(dft[rep_index], wij*rho[perm][rep_index])
     return adjust_zeros(dft)
 
 def adjust_zeros(dft):
@@ -195,6 +194,7 @@ def matrix_rep_gen(n):
         representation = []
         for shape in tableaux_by_shape:
             sort_tableaux(n, shape)
+            print(shape)
             rep = np.zeros((len(shape), len(shape)))
             for index in range(len(shape)):
                 tableau = Tableau(shape[index].data)
@@ -291,7 +291,6 @@ def generate_tableaux(n):
         return ans
 
 
-
 def tableaux_shape(n, partition):
     '''
     Generates all tableaux of size n, that fit a given partition
@@ -320,7 +319,7 @@ def __main__():
     sn = Permutation.group(3)
     for sigma in sn:
     print(rho[sigma][1])"""
-    for arr in DFT_w_ij(5, 5,5):
+    for arr in DFT_w_ij(5,5,5):
         print(arr)
 
 __main__()

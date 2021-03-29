@@ -55,8 +55,8 @@ def transition_major_index(n):
     
     
 def __main__():
-    trans_mat = transition_major_index(5)[0]
-    print(transition_major_index(5))
+    trans_mat = transition_major_index(3)[0]
+    #print(transition_major_index(5))
     #print(wolfram_syntax(trans_mat))
     print(matlab_syntax(trans_mat))
     #print(transition_excedances(4))
