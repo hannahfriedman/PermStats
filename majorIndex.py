@@ -32,6 +32,14 @@ def calc_major_index(perm, n):
             count+= index
     return count
 
+def major_index_tot(n):
+    count = 0
+    sn = Permutation.group(sn)
+    for sigma in sn:
+        count += calc_major_index(sigma, n)
+    return count
+
+
 
 def f(n):
     mat = generate_matrix(n)

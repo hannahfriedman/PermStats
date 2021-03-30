@@ -4,15 +4,11 @@ from matrixRepCalc import DFT_length
 from matrixRepCalc import DFT_w_ij
 from permutation import Permutation
 from excedances import count_excedances
+from misc import total_length
 import matplotlib.pyplot as plt
 import numpy as np
 
-def total_length(n):
-    sn = Permutation.group(n)
-    length = 0
-    for sigma in sn:
-        length+=sigma.inversions()
-    return length
+
 
 def total_exced(n):
     sn = Permutation.group(n)
@@ -61,8 +57,8 @@ def plot_var_dist2(mat, mat1, max_pow):
 
 def __main__():
     #Excedances:
-    mat = DFT_excedances(5)[2]
-    mat = normalize(mat, total_exced(5))
+    mat = DFT_excedances(4)[2]
+    mat = normalize(mat, total_exced(4))
     plot_var_dist(mat, 20)
     #print(DFT_excedances(6)) -- nonzero matrix index is 4
 
