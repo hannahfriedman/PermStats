@@ -14,7 +14,7 @@ def w_ij(sigma, j, i):
 def w_ij_kl(sigma, i, j, k, l):
     """
     input: permutation
-    output: 1 if sigma(k) = i, sigma(l) = j 
+    output: 1 if sigma(k) = i, and sigma(l) = j 
     """
     if sigma(k) == i and sigma(l) == j:
         return 1

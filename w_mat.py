@@ -12,16 +12,24 @@ import numpy as np
 #Permutation statistic function I can't impor for some reason
 
 def total_length(n):
+    """
+    returns the total length (number of inversion)
+    over all permutations in Sn
+    """
     sn = Permutation.group(n)
     length = 0
     for sigma in sn:
-        length+=sigma.inversions()
+        length += sigma.inversions()
     return length
 
 def length(sigma, n):
     return sigma.inversions()
 
 def major_index_tot(n):
+    """
+    returns the total major index
+    over all permutations in Sn
+    """
     count = 0
     sn = Permutation.group(n)
     for sigma in sn:
