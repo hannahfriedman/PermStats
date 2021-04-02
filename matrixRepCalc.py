@@ -8,6 +8,10 @@ from permutation import Permutation
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
 def fac(n):
+    '''
+    Returns factorial of n, n!
+    only defined for integers n >= 0
+    '''
     if n == 0:
         return 1
     else:
@@ -15,7 +19,7 @@ def fac(n):
 
 def DTF(n, f):
     """
-    n--int n in S_n
+    n--int n, size of permutation group S_n
     f--dict function from S_n to Z
     """
     return
