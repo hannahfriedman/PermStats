@@ -3,7 +3,12 @@ from numpy.linalg import matrix_power
 import math
 import copy
 from Tableau import Tableau
+from excedances import count_excedances
 from permutation import Permutation
+from majorIndex import calc_major_index
+from misc import matlab_syntax
+from wij import w_ij
+
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
@@ -17,23 +22,148 @@ def fac(n):
     else:
         return n*fac(n-1)
 
-def DTF(n, f):
+def DFT_length(n):
     """
     n--int n, size of permutation group S_n
     f--dict function from S_n to Z
     """
-    return
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        length = perm.inversions()
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(length*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], length*rho[perm][i])
+    return adjust_zeros(dft)
+
+def DFT_excedances(n):
+    """
+    n--int n in S_n
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        excedances = count_excedances(perm, n)
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(excedances*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], excedances*rho[perm][i])
+
+    return adjust_zeros(dft)
+
+
+def DFT_major_index(n):
+    """
+    n--int n in S_n
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for i in range(nfac):
+        perm = next(sn)
+        major_index = calc_major_index(perm, n)
+        if i == 0:
+            for mat in rho[perm]:
+                dft.append(major_index*mat)
+        else:
+            for i in range(len(rho[perm])):
+                dft[i] = np.add(dft[i], major_index*rho[perm][i])
+
+    return adjust_zeros(dft)
+
+def DFT_w_ij(n, i, j):
+    """
+    n--int n in S_n
+    """
+    nfac = fac(n)
+    sn = Permutation.group(n)
+    dft = []
+    rho = matrix_rep(n)
+    for index in range(nfac):
+        perm = next(sn)
+        wij = w_ij(perm, j, i)
+        if index == 0:
+            for mat in rho[perm]:
+                dft.append(wij*mat)
+        else:
+            for rep_index in range(len(rho[perm])):
+                dft[rep_index] = np.add(dft[rep_index], wij*rho[perm][rep_index])
+    return adjust_zeros(dft)
+
+def adjust_zeros(dft):
+    for mat in dft:
+        for row in range(mat.shape[0]):
+            for col in range(mat.shape[1]):
+                if abs(mat[row, col]) <= 10**-10:
+                    mat[row,col] = 0
+    return dft
 
 def matrix_rep(n):
     """
     n--int n in S_n
-    returns a dict that maps the elements of S_n to their orthogonal matrix representations
+    returns a dict that maps the 2-cycles of S_n to their orthogonal matrix representations
+    """
+    rho_gen = matrix_rep_gen(n)
+    rho = {}
+    sn = factor_sn(n)
+    for perm in sn:
+        key = Permutation.cycle()
+        val = []
+        for mat in rho_gen[Permutation.cycle(1,2)]:
+            val.append(matrix_power(mat, 2))
+        for transposition in perm:
+            if transposition != Permutation.cycle():
+                key *= transposition
+                for i in range(len(val)):
+                    val[i] = np.matmul(val[i], rho_gen[transposition][i])
+        rho[key] = val
+    return rho
+
+
+def factor_sn(n):
+    """
+    n--int n in S_n
+    returns a list of lists of factorizations of all elements of Sn
+    """
+    if n == 2:
+        return [[Permutation.cycle()], [Permutation.cycle(1,2)]]
+    else:
+        sn_minus_one = factor_sn(n-1)
+        sn = sn_minus_one
+        prev_coset = sn_minus_one
+        curr_coset = []
+        for i in range(1, n):
+            for perm in prev_coset:
+                newPerm = perm + [Permutation.cycle(n-i,n-i+1)]
+                curr_coset.append(newPerm)
+            sn = sn + curr_coset
+            prev_coset = curr_coset
+            curr_coset = []
+        return sn
+
+
+
+def matrix_rep_transpositions(n):
+    """
+    n--int n in S_n
+    returns a dict that maps the 2-cycles of S_n to their orthogonal matrix representations
     With help from formulas obtained in: https://math.stackexchange.com/questions/3420570/writing-permutations-as-products-of-adjacent-transposition 
     """
     rho_gen = matrix_rep_gen(n)
     rho = rho_gen
     nfac = fac(n)
-    sn = Permutation.group(n)
     
     # Calcultes the matrix representation for all 2-cycles
     for diff in range(2, n):
@@ -61,13 +191,15 @@ def matrix_rep_gen(n):
     returns a dict that maps the generators of S_n to their orthogonal matrix representations
     """
     partitions = generate_partitions(n)
-    rev_partitions = partitions.reverse()
+    partitions.reverse()
+    #print(partitions)
     tableaux_by_shape = [tableaux_shape(n, partition) for partition in partitions]
     rho = {}
     for i in range(1,n):
         representation = []
         for shape in tableaux_by_shape:
             sort_tableaux(n, shape)
+            print(shape)
             rep = np.zeros((len(shape), len(shape)))
             for index in range(len(shape)):
                 tableau = Tableau(shape[index].data)
@@ -164,7 +296,6 @@ def generate_tableaux(n):
         return ans
 
 
-
 def tableaux_shape(n, partition):
     '''
     Generates all tableaux of size n, that fit a given partition
@@ -186,3 +317,14 @@ def sort_tableaux(n, tableaux):
                 switched = True
     return
 
+def __main__():
+    """
+    rho = matrix_rep(3)
+    print(rho)
+    sn = Permutation.group(3)
+    for sigma in sn:
+    print(rho[sigma][1])"""
+    for arr in DFT_w_ij(5,5,5):
+        print(arr)
+
+__main__()
