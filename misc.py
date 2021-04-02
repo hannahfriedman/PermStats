@@ -26,3 +26,8 @@ def matlab_syntax(mat):
             string += ";"
     print(string)
 
+def normalize(mat, stat):
+    for row in range(mat.shape[0]):
+        for col in range(mat.shape[1]):
+            mat[row, col] =  mat[row, col]/stat
+    return mat

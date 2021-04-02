@@ -74,3 +74,50 @@ class Tableau(object):
         switched_tableau.data[k_row][k_col] = k+1
         switched_tableau.data[k_plus_one_row][k_plus_one_col] = k
         return switched_tableau
+
+    @staticmethod
+    def generate_all(n):
+        '''
+        Generates all tableaux of a given size n
+        '''
+        if n == 1:
+            return [Tableau([[1]])]
+        else:
+            prev_tab = Tableau.generate_all(n-1)
+            ans = []
+            for tab in prev_tab:
+                for i in range(len(tab.data)):
+            # adds n to end of row if allowed
+                    if i == 0 or len(tab.data[i]) < len(tab.data[i-1]):
+                        ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
+            # adds n as a new row
+            ans += [Tableau(tab.data + [[n]]) for tab in prev_tab]
+
+        return ans
+    
+    @staticmethod
+    def gen_by_shape(n, partition):
+        '''
+        Generates all tableaux of size n, that fit a given partition
+        '''
+        ans = []
+        tableaux_list = Tableau.generate_all(n)
+        for tab in tableaux_list:
+            if tab.shape == partition:
+                ans += [tab]
+        return ans
+      
+    @staticmethod
+    def sort(tableaux: list) -> None:
+        """
+        sorts a list of tableau
+        all of them should have the same shape
+        """
+        switched = True
+        while switched:
+            switched = False
+            for i in range(len(tableaux) - 1):
+                if tableaux[i] < tableaux[i+1]:
+                    tableaux[i], tableaux[i+1] = tableaux[i+1], tableaux[i]
+                    switched = True
+        return

@@ -9,20 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
-def total_exced(n):
-    sn = Permutation.group(n)
-    count = 0
-    for sigma in sn:
-        count += count_excedances(sigma, n)
-    return count
-
-def normalize(mat, stat):
-    for row in range(mat.shape[0]):
-        for col in range(mat.shape[1]):
-            mat[row, col] =  mat[row, col]/stat
-    return mat
-
 def var_dist(mat):
     max_val = -1
     for row in range(mat.shape[0]):

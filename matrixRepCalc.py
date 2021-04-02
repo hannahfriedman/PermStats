@@ -12,22 +12,12 @@ from wij import w_ij
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
-def fac(n):
-    '''
-    Returns factorial of n, n!
-    only defined for integers n >= 0
-    '''
-    if n == 0:
-        return 1
-    else:
-        return n*fac(n-1)
-
 def DFT_length(n):
     """
     n--int n, size of permutation group S_n
     f--dict function from S_n to Z
     """
-    nfac = fac(n)
+    nfac = math.factorial(n)
     sn = Permutation.group(n)
     dft = []
     rho = matrix_rep(n)
@@ -46,7 +36,7 @@ def DFT_excedances(n):
     """
     n--int n in S_n
     """
-    nfac = fac(n)
+    nfac = math.factorial(n)
     sn = Permutation.group(n)
     dft = []
     rho = matrix_rep(n)
@@ -67,7 +57,7 @@ def DFT_major_index(n):
     """
     n--int n in S_n
     """
-    nfac = fac(n)
+    nfac = math.factorial(n)
     sn = Permutation.group(n)
     dft = []
     rho = matrix_rep(n)
@@ -87,7 +77,7 @@ def DFT_w_ij(n, i, j):
     """
     n--int n in S_n
     """
-    nfac = fac(n)
+    nfac = math.factorial(n)
     sn = Permutation.group(n)
     dft = []
     rho = matrix_rep(n)
@@ -163,7 +153,6 @@ def matrix_rep_transpositions(n):
     """
     rho_gen = matrix_rep_gen(n)
     rho = rho_gen
-    nfac = fac(n)
     
     # Calcultes the matrix representation for all 2-cycles
     for diff in range(2, n):
@@ -271,51 +260,6 @@ def remove_dubs(partition):
         if part not in result:
             result.append(part)
     return result
-
-
-def generate_tableaux(n):
-    '''
-    Generates all tableaux of a given size n
-    '''
-    if n == 1:
-        return [Tableau([[1]])]
-    else:
-        prev_tab = generate_tableaux(n-1)
-        ans = []
-        for tab in prev_tab:
-            for i in range(len(tab.data)):
-        # Aldrin: this first if statement doesn't seem necessary so it is removed for now
-                # if tab.size == 1: 
-                    # ans += [Tableau([tab.data[i] + [n]])]
-        # adds n to end of row if allowed
-                if i == 0 or len(tab.data[i]) < len(tab.data[i-1]):
-                    ans += [Tableau(tab.data[0:i] + [tab.data[i] + [n]] + tab.data[i+1:])]
-        # adds n as a new row
-        ans += [Tableau(tab.data + [[n]]) for tab in prev_tab]
-
-        return ans
-
-
-def tableaux_shape(n, partition):
-    '''
-    Generates all tableaux of size n, that fit a given partition
-    '''
-    ans = []
-    tableaux_list = generate_tableaux(n)
-    for tab in tableaux_list:
-        if tab.shape == partition:
-            ans += [tab]
-    return ans
-      
-def sort_tableaux(n, tableaux):
-    switched = True
-    while switched:
-        switched = False
-        for i in range(len(tableaux) - 1):
-            if tableaux[i] < tableaux[i+1]:
-                tableaux[i], tableaux[i+1] = tableaux[i+1], tableaux[i]
-                switched = True
-    return
 
 def __main__():
     """
