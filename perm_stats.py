@@ -1,5 +1,5 @@
 from permutation import Permutation
-from typing import Any
+from typing import Callable
 
 def excedances(sigma: Permutation, n: int) -> int:
     """
@@ -30,7 +30,7 @@ def length(sigma: Permutation, n: int) -> int:
     """
     return sigma.inversions()
 
-def w_ij(i: int, j: int) -> Any:
+def w_ij(i: int, j: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij function
     the returned function takes in a permutation sigma, and size n
@@ -38,10 +38,21 @@ def w_ij(i: int, j: int) -> Any:
     """
     return (lambda sigma, n: int(sigma(j) == i))
 
-def w_ij_kl(i: int, j: int, k: int, l: int) -> Any:
+def w_ij_kl(i: int, j: int, k: int, l: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij_kl function
     the returned function takes in a permutation sigma, and size n
     and returns 1 if sigma maps k to i and l to j, and 0 otherwise
     """
     return (lambda sigma, n: int(sigma(k) == i and sigma(l) == j))
+
+def total(f: Callable[[Permutation, int], int], n: int) -> int:
+    """
+    Returns the sum of f called on every permutation in Sn
+    f should take inputs sigma (permutation) and n (int) and return an int
+    """
+    count = 0
+    sn = Permutation.group(n)
+    for sigma in sn:
+        count += f(sigma, n)
+    return count

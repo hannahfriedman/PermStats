@@ -16,7 +16,7 @@ def generate_matrix(n):
     for row in range(n-1):
         for col in range(len(permList)):
             for i in range(1, n+1):
-                if permList[col].__call__(i)==row + 2  and row + 2>i:
+                if permList[col](i)==row + 2  and row + 2>i:
                     mat[row, col] = 1
     #for perm in permList:
     #   print(perm.__str__())

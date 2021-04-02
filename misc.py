@@ -31,3 +31,12 @@ def normalize(mat, stat):
         for col in range(mat.shape[1]):
             mat[row, col] =  mat[row, col]/stat
     return mat
+
+
+def adjust_zeros(dft):
+    for mat in dft:
+        for row in range(mat.shape[0]):
+            for col in range(mat.shape[1]):
+                if abs(mat[row, col]) <= 10**-10:
+                    mat[row,col] = 0
+    return dft
