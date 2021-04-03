@@ -1,40 +1,9 @@
-from excedances import count_excedances
-from excedances import total_exced
-from majorIndex import calc_major_index
 from permutation import Permutation
-from wij import w_ij
-from wij import w_ij_kl
 from misc import matlab_syntax
 import matplotlib.pyplot as plt
 import numpy as np
+import perm_stats
 
-###------------------------------------------------------------------------------------
-#Permutation statistic function I can't impor for some reason
-
-def total_length(n):
-    """
-    returns the total length (number of inversion)
-    over all permutations in Sn
-    """
-    sn = Permutation.group(n)
-    length = 0
-    for sigma in sn:
-        length += sigma.inversions()
-    return length
-
-def length(sigma, n):
-    return sigma.inversions()
-
-def major_index_tot(n):
-    """
-    returns the total major index
-    over all permutations in Sn
-    """
-    count = 0
-    sn = Permutation.group(n)
-    for sigma in sn:
-        count += calc_major_index(sigma, n)
-    return count
 ###------------------------------------------------------------------------------------
 
 ###------------------------------------------------------------------------------------
@@ -43,7 +12,7 @@ def w_ij_mat(n, sigma):
     mat = np.zeros((n,n))
     for i in range(1, n+1):
         for j in range(1, n+1):
-            mat[i-1, j-1] = w_ij(sigma, j, i)
+            mat[i-1, j-1] = perm_stats.w_ij(i,j)(sigma,n)
     return mat
 
 def w_ij_kl_mat(n, sigma):
@@ -54,7 +23,7 @@ def w_ij_kl_mat(n, sigma):
                 for l in range(1, n+1):
                     row = (i-1)*n + (j-1)
                     col = (k-1)*n + (l-1)
-                    mat[row, col] = w_ij_kl(sigma, i, j, k, l)
+                    mat[row, col] = perm_stats.w_ij_kl(i, j, k, l)(sigma, n)
     return mat
 
 def w_mat_sn(n, w):
@@ -66,10 +35,10 @@ def w_mat_sn(n, w):
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 # Linear combinations of w matrices using coefficients
-def representation(n, function, function_sum, w, dim):
+def representation(n, function, w, dim):
     sn = Permutation.group(n)
     mats = w_mat_sn(n, w)
-    tot = function_sum(n)
+    tot = perm_stats.total(function, n)
     mat = np.zeros((dim,dim))
     for sigma in sn:
         factor = function(sigma, n)/tot
@@ -78,14 +47,14 @@ def representation(n, function, function_sum, w, dim):
 
 def rep(n, function):
     '''
-    User friendly version of representation function
+    #User friendly version of representation function
     '''
     if function == "exced":
-        return representation(n, count_excedances, total_exced, w_ij_mat, n)
+        return representation(n, perm_stats.excedances, w_ij_mat, n)
     if function == "major index":
-        return representation(n, calc_major_index, major_index_tot, w_ij_kl_mat, n**2)
+        return representation(n, perm_stats.major_index, w_ij_kl_mat, n**2)
     if function == "length":
-        return representation(n, length, total_length, w_ij_kl_mat, n**2)
+        return representation(n, perm_stats.length, w_ij_kl_mat, n**2)
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 # Convert the matrices into complex, diagonal matrices and analyze
@@ -145,8 +114,6 @@ pvd(4, "length", 20)
 # print(evals)
 # print(evecs)
 
-
-#print(matlab_syntax(rep))
 
 
 
