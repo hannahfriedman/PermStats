@@ -1,4 +1,5 @@
 from permutation import Permutation
+import math
 def wolfram_syntax(mat):
     string = "{"
     for row in range(len(mat)):
@@ -40,3 +41,13 @@ def adjust_zeros(dft):
                 if abs(mat[row, col]) <= 10**-10:
                     mat[row,col] = 0
     return dft
+
+def falling_factorial(n: int, k:int) -> int:
+    """
+    returns n falling factorial k
+    """
+    product = 1
+    while n > k:
+        product *= n
+        n -= 1
+    return product
