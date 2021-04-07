@@ -80,8 +80,7 @@ def matrix_rep_gen(n):
     n--int n in S_n
     returns a dict that maps the generators of S_n to their orthogonal matrix representations
     """
-    partitions = generate_partitions(n)
-    partitions.reverse()
+    partitions = sort_partitions(generate_partitions(n))
     tableaux_by_shape = [Tableau.gen_by_shape(n, partition) for partition in partitions]
     rho = {}
     for i in range(1,n):
@@ -117,6 +116,31 @@ def generate_partitions(n):
     for x in range(1, n):
         ans += [[x] + part for part in generate_partitions(n-x)]
     return remove_dubs(ans) + [[n]]
+
+def sort_partitions(partitions: list) -> list:
+    '''
+    sort partitions according to dominance order, in descending order
+    '''
+    switched = True
+    while switched:
+        switched = False
+        for i in range(len(partitions)-1):
+            if compare_partitions(partitions[i+1], partitions[i]):
+                partitions[i], partitions[i+1] = partitions[i+1], partitions[i]
+                switched = True
+    return partitions
+
+def compare_partitions(partition1: list, partition2: list) -> bool:
+    '''
+    returns true if partition1 dominates partition2, false otherwise
+    '''
+    sum1 = 0
+    sum2 = 0
+    for i in range(len(partition1)):
+        sum1 += partition1[i]
+        sum2 += partition2[i]
+        if sum1 != sum2:
+            return sum1 > sum2
 
 def remove_dubs(partition):
     ''' 
@@ -171,3 +195,6 @@ def __main__():
 
 
 __main__()
+
+for mat in dft(perm_stats.w_ij(4,4), 4):
+    print(mat)

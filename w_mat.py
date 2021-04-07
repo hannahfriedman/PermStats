@@ -99,6 +99,16 @@ def count_unique(mats: list) -> list:
     return used
 
 
+def print_mult_table(n: int) -> None:
+    flat = convolve(n)
+    arr = []
+    for i in range(n**2):
+        arr.append(flat[i*(n**2):(i+1)*(n**2)])
+    for x in arr:
+        for y in x:
+            print(y)
+        print('\n')
+
 
 
 ###------------------------------------------------------------------------------------
