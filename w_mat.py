@@ -160,7 +160,11 @@ N = rep(3, "major index")
 O = rep(4, "length")
 
 
-
+for i in range(1,5):
+    for j in range(1,5):
+        print(i)
+        print(j)
+        print(rep_w_ij(i,j,4))
 
 
 

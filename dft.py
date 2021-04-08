@@ -191,10 +191,10 @@ def __main__():
     sn = Permutation.group(3)
     for sigma in sn:
     print(rho[sigma][1])"""
-    dft(perm_stats.excedances, 3)
+    dft(perm_stats.length, 6)
 
 
 __main__()
 
-for mat in dft(perm_stats.w_ij(4,4), 4):
+for mat in dft(perm_stats.major_index, 5):
     print(mat)
