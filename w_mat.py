@@ -99,21 +99,8 @@ def count_unique(mats: list) -> list:
     return used
 
 
-def print_mult_table(n: int) -> None:
-    flat = convolve(n)
-    arr = []
-    for i in range(n**2):
-        arr.append(flat[i*(n**2):(i+1)*(n**2)])
-    for x in arr:
-        for y in x:
-            print(y)
-        print('\n')
-
-
-
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
-# Convert the matrices into complex, diagonal matrices and analyze
 def diagonalize(n, rep):
     mat = np.zeros((n,n), dtype = complex)
     evals = np.linalg.eig(rep)[0]
@@ -122,12 +109,13 @@ def diagonalize(n, rep):
     return mat
 
 def var_dist(mat):
-    max_val = -1
-    for row in range(1, mat.shape[0]):
-        for col in range(1, mat.shape[1]):
-            if norm(mat[row,col]) > max_val:
-                max_val = norm(mat[row,col])
-    return max_val
+    norm_dist_val = 1/mat.shape[0]
+    max_dif = 0
+    for row in range(0, mat.shape[0]):
+        for col in range(0, mat.shape[1]):
+            if abs(mat[row, col] - norm_dist_val) > max_dif:
+                max_dif = abs(mat[row, col] - norm_dist_val)
+    return max_dif
 
 def norm(c):
     return c.real**2 + c.imag**2
@@ -136,35 +124,39 @@ def plot_var_dist(mat, max_pow):
     powers = []
     for power in range(1, max_pow+1):
         powers.append(var_dist(np.linalg.matrix_power(mat, power)))
-    plt.yscale('log')
     plt.scatter(range(1, max_pow+1), powers)
-    plt.show()
+    plt.yscale("linear")
     return powers
 
-def pvd(n, function, max_pow):
+def pvd(n, function1, max_pow):
     """
     User friendly version of plot_var_dist
     """
-    mat = rep(n, function)
-    if function == "exced":
-        dim = n
-    else:
-        dim = misc.falling_factorial(n, n-2)
-    print(misc.matlab_syntax(mat))
-    diag = diagonalize(dim, mat)
-    #print(misc.matlab_syntax(diag))
-    plot_var_dist(diag, max_pow)
+    mat1 = rep(n, function1)
+    plot_var_dist(mat1, max_pow)
+
+def pvd_w_ij(n, i, j, max_pow):
+    """
+    User friendly version of plot_var_dist for w_ij functions
+    """
+    mat1 = rep_w_ij(i, j, n)
+    plot_var_dist(mat1, max_pow)
+    
+
+
+
 
 M = rep(4, "exced")
 N = rep(3, "major index")
 O = rep(4, "length")
 
+pvd(5, "exced", 20)
+pvd(5, "major index", 20)
+pvd(5, "length", 20)
 
-for i in range(1,5):
-    for j in range(1,5):
-        print(i)
-        print(j)
-        print(rep_w_ij(i,j,4))
+pvd_w_ij(4, 1,4, 20)
+plt.show()
+
 
 
 
