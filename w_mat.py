@@ -54,7 +54,7 @@ def representation(n, function, w, dim):
 
 def rep(n, function):
     '''
-    #User friendly version of representation function
+    User friendly version of representation function
     '''
     if function == "exced":
         return representation(n, perm_stats.excedances, w_ij_mat, n)
@@ -144,18 +144,24 @@ def pvd_w_ij(n, i, j, max_pow):
     
 
 
+print(np.matmul(rep_w_ij(1, 2, 3), rep_w_ij(3,1, 3)))
+
+# print((rep_w_ij(1, 2, 3) + rep_w_ij(1, 3, 3) + rep_w_ij(3,1, 3)+ rep_w_ij(2, 1, 3))/4)
+
+print((w_ij_mat(Permutation(2,1,3), 3)+ w_ij_mat(Permutation(3,1,2), 3) + w_ij_mat(Permutation(2,3,1), 3) + w_ij_mat(Permutation(3,2,1), 3))/4)
 
 
-M = rep(4, "exced")
-N = rep(3, "major index")
-O = rep(4, "length")
 
-pvd(5, "exced", 20)
-pvd(5, "major index", 20)
-pvd(5, "length", 20)
+# M = rep(4, "exced")
+# N = rep(3, "major index")
+# O = rep(4, "length")
 
-pvd_w_ij(4, 1,4, 20)
-plt.show()
+# pvd(5, "exced", 20)
+# pvd(5, "major index", 20)
+# pvd(5, "length", 20)
+
+# pvd_w_ij(4, 1,4, 20)
+# plt.show()
 
 
 
