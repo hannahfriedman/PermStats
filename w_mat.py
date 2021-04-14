@@ -69,6 +69,22 @@ def rep_w_ij(i: int, j: int, n: int) -> np.array:
     """
     return representation(n, perm_stats.w_ij(i,j), w_ij_mat, n)
 
+def rep_w_ij_kl(i: int, j: int, k: int, l: int, n: int) -> np.array:
+    """
+    Generates linear combinations of w_ij_kl matrices for convolving
+    """
+    return representation(n, perm_stats.w_ij_kl(i,j,k,l), w_ij_kl_mat, misc.falling_factorial(n, n-2))
+
+def rep_tau(tau, function, n):
+    mat1 = tau*rep(n, function)
+    if function == "exced":
+        w = rep_w_ij(1,1, n)
+    else:
+        w = rep_w_ij_kl(1,2,1,2,n)
+    mat2 = (1-tau)*w
+    return mat1+mat2
+
+
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 
@@ -101,13 +117,6 @@ def count_unique(mats: list) -> list:
 
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
-def diagonalize(n, rep):
-    mat = np.zeros((n,n), dtype = complex)
-    evals = np.linalg.eig(rep)[0]
-    for i in range(n):
-        mat[i,i] = evals[i]
-    return mat
-
 def var_dist(mat):
     norm_dist_val = 1/mat.shape[0]
     max_dif = 0
@@ -117,38 +126,43 @@ def var_dist(mat):
                 max_dif = abs(mat[row, col] - norm_dist_val)
     return max_dif
 
-def norm(c):
-    return c.real**2 + c.imag**2
-
 def plot_var_dist(mat, max_pow):
     powers = []
     for power in range(1, max_pow+1):
         powers.append(var_dist(np.linalg.matrix_power(mat, power)))
     plt.scatter(range(1, max_pow+1), powers)
+
     plt.yscale("linear")
     return powers
 
-def pvd(n, function1, max_pow):
+def pvd(n, function, max_pow, tau):
     """
     User friendly version of plot_var_dist
     """
-    mat1 = rep(n, function1)
-    plot_var_dist(mat1, max_pow)
+    mat = rep_tau(tau, function, n)
+    plot_var_dist(mat, max_pow)
 
-def pvd_w_ij(n, i, j, max_pow):
+def pvd_w_ij(i: int, j: int, max_pow: int, n: int) -> None:
     """
     User friendly version of plot_var_dist for w_ij functions
     """
     mat1 = rep_w_ij(i, j, n)
     plot_var_dist(mat1, max_pow)
+
+def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
+    """
+    User friendly version of plot_var_dist for w_ij functions
+    """
+    mat1 = rep_w_ij(i, j, n)/2 + rep_w_ij(k,l, n)/2
+    plot_var_dist(mat1, max_pow)
     
 
 
-print(np.matmul(rep_w_ij(1, 2, 3), rep_w_ij(3,1, 3)))
+# print(np.matmul(rep_w_ij(1, 2, 3), rep_w_ij(3,1, 3)))
 
 # print((rep_w_ij(1, 2, 3) + rep_w_ij(1, 3, 3) + rep_w_ij(3,1, 3)+ rep_w_ij(2, 1, 3))/4)
 
-print((w_ij_mat(Permutation(2,1,3), 3)+ w_ij_mat(Permutation(3,1,2), 3) + w_ij_mat(Permutation(2,3,1), 3) + w_ij_mat(Permutation(3,2,1), 3))/4)
+# print((w_ij_mat(Permutation(2,1,3), 3)+ w_ij_mat(Permutation(3,1,2), 3) + w_ij_mat(Permutation(2,3,1), 3) + w_ij_mat(Permutation(3,2,1), 3))/4)
 
 
 
@@ -156,12 +170,24 @@ print((w_ij_mat(Permutation(2,1,3), 3)+ w_ij_mat(Permutation(3,1,2), 3) + w_ij_m
 # N = rep(3, "major index")
 # O = rep(4, "length")
 
-# pvd(5, "exced", 20)
+for i in range(1,20):
+    pvd(5, "length", 80, 1/i)
+plt.show()
+
+
 # pvd(5, "major index", 20)
 # pvd(5, "length", 20)
 
-# pvd_w_ij(4, 1,4, 20)
-# plt.show()
+
+
+# n = 3
+# for i in range(1,n+1):
+#     for j in range(1,n+1):
+#         for k in range(1,n+1):
+#             pvd_w_ij_kl(j,k,i,i, 20, n)
+#     plt.show()
+
+
 
 
 

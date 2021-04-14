@@ -12,6 +12,17 @@ def excedances(sigma: Permutation, n: int) -> int:
             count += 1
     return count
 
+# def weak_excedances(sigma: Permutation, n: int) -> int:
+#     """
+#     returns the number of weak excedances of a given permutation
+#     sigma: given permutation over n integers
+#     """
+#     count = 0
+#     for i in range(1, n+1):
+#         if i <= sigma(i):
+#             count += 1
+#     return count
+
 def major_index(sigma: Permutation, n: int) -> int:
     """
     returns the major index of a given permutation
