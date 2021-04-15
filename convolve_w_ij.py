@@ -80,6 +80,10 @@ def convolve(i: int, j: int, k: int, l: int, n: int) -> dict:
     
     
 def print_group_alg_elem(w: dict, n: int) -> None:
+    """
+    print function for elements in the group algebra
+    prints a plus at the end which can be ignored and ends in a line break
+    """
     sn = Permutation.group(n)
     for sigma in sn:
         print(str(w[sigma]) + " " + str(sigma) + " + ", end = "")
@@ -87,7 +91,10 @@ def print_group_alg_elem(w: dict, n: int) -> None:
 
 
 
-def compare_sum_product(i: int, j: int, k: int, l: int, n):
+def compare_sum_product(i: int, j: int, k: int, l: int, n) -> bool:
+    """
+    function for testing hypthesis for small n
+    """
     prod = convolve(i,j,k,l,n)
     if j == k:
         wijkl_sum = generate_w_ij_elem(i, l, n)
@@ -96,13 +103,11 @@ def compare_sum_product(i: int, j: int, k: int, l: int, n):
     equal = True
     sn = Permutation.group(n)
     for sigma in sn:
-        if abs(prod[sigma] - wijkl_sum[sigma]) > 10**(-10):
+        if abs(prod[sigma] - wijkl_sum[sigma]) > 10**(-10): # Avoid computational error
             return False
     return True
 
-# print_group_alg_elem(generate_w_ij_elem(1,2,4),5)   
-print_group_alg_elem(convolve(2,3,1,5,5),5)
-
+# Test hypothesis for small n; do not try to test for n>5 
 # n = 5
 # for i in range(1,n+1):
 #     for j in range(1,n+1):

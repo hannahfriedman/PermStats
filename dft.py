@@ -32,45 +32,58 @@ def dft(f: Callable[[Permutation, int], int], n: int) -> list:
                 result[index] = np.add(result[index], perm_stat*rho[sigma][index])
     return adjust_zeros(result)
 
-def matrix_rep(n):
+def matrix_rep(n: int) -> dict:
     """
     n--int n in S_n
-    returns a dict that maps the 2-cycles of S_n to their orthogonal matrix representations
+    returns a dict every permutation in Sn to it's orthogonal matrix representation
     """
+    # Create dictionary representation the DFT for the generates of SN (adjacent transpositions)
     rho_gen = matrix_rep_gen(n)
     rho = {}
+    # Creates a list of lists of permutation in Sn factored into adjacent transpositions
     sn = factor_sn(n)
-    for perm in sn:
-        key = Permutation.cycle()
+    for sigma in sn:
+        key = Permutation()
         val = []
+        # Becuase the identity is not in the list of generators, start by populating val list 
+        # with (1 2)^2 which is the identity
         for mat in rho_gen[Permutation.cycle(1,2)]:
             val.append(matrix_power(mat, 2))
-        for transposition in perm:
-            if transposition != Permutation.cycle():
+        # For each factor, multiply by the appropriate matrix
+        for transposition in sigma:
+            if sigma != Permutation(): # don't use the identity because we don't have a matrix representation for it
                 key *= transposition
                 for i in range(len(val)):
                     val[i] = np.matmul(val[i], rho_gen[transposition][i])
-        rho[key] = val
+        rho[key] = val # Add key and value to map
     return rho
 
 
-def factor_sn(n):
+def factor_sn(n: int) -> list:
     """
-    n--int n in S_n
+    n - int n in S_n
     returns a list of lists of factorizations of all elements of Sn
+    We find this list recursively but multiplying Sn-1 by transpositions that move n into
+    all possible positions
     """
+    # Base case: permutations in Sn are already factored
     if n == 2:
         return [[Permutation.cycle()], [Permutation.cycle(1,2)]]
     else:
+        # Find factorization of Sn-1 recursively
         sn_minus_one = factor_sn(n-1)
+        # Sn-1 is a subset of Sn, so start by adding those values to our list
         sn = sn_minus_one
         prev_coset = sn_minus_one
         curr_coset = []
         for i in range(1, n):
-            for perm in prev_coset:
-                newPerm = perm + [Permutation.cycle(n-i,n-i+1)]
-                curr_coset.append(newPerm)
+            # Move n to next position in permutation for each sigma in the previous coset
+            for sigma in prev_coset:
+                tau = sigma + [Permutation.cycle(n-i,n-i+1)]
+                curr_coset.append(tau)
+            # Add the values we just computed to sn
             sn = sn + curr_coset
+            # Reset necessary values for next iteration
             prev_coset = curr_coset
             curr_coset = []
         return sn        
