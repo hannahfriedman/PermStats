@@ -1,6 +1,7 @@
 from permutation import Permutation
 import math
-def wolfram_syntax(mat):
+
+def wolfram_syntax(mat: np.array) -> None:
     string = "{"
     for row in range(len(mat)):
         string+="{"
@@ -15,7 +16,7 @@ def wolfram_syntax(mat):
     string+= "}"
     print(string)
 
-def matlab_syntax(mat):
+def matlab_syntax(mat: np.array) -> None:
     string = "["
     for row in range(len(mat)):
         for col in range(len(mat)):
@@ -27,7 +28,7 @@ def matlab_syntax(mat):
             string += ";"
     print(string)
 
-def latex_syntax(mat):
+def latex_syntax(mat: np.array) -> None:
     """
     returns a string that prints the matrix to insert into latex
     for example:
@@ -45,14 +46,10 @@ def latex_syntax(mat):
     string = string[:-4]   # to remove last end line
     print(string)
 
-def normalize(mat, stat):
-    for row in range(mat.shape[0]):
-        for col in range(mat.shape[1]):
-            mat[row, col] =  mat[row, col]/stat
-    return mat
-
-
-def adjust_zeros(dft):
+def adjust_zeros(dft: dict) -> dict:
+    """
+    Accounts for computational errors by setting very small values equal to 0
+    """
     for mat in dft:
         for row in range(mat.shape[0]):
             for col in range(mat.shape[1]):
