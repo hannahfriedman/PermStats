@@ -28,12 +28,20 @@ def matlab_syntax(mat):
     print(string)
 
 def latex_syntax(mat):
+    """
+    returns a string that prints the matrix to insert into latex
+    for example:
+        a & b & c \\
+        d & e & f \\
+        g & h & i
+    """
     string = ""
     for row in range(mat.shape[0]):
         for col in range(mat.shape[1]):
             string += str(mat[row, col])
             string += " & "
-        string += "\\\ \n"
+        string += r'\\ '   # to avoid treating \\ as special character
+        string += "\n"
     string = string[:-4]   # to remove last end line
     print(string)
 
