@@ -21,6 +21,11 @@ def printOneLineNotation(sigma: Permutation, n: int) -> str:
 
 
 def printLinearComboW(d: dict, n: int) -> str:
+    """
+    takes a of w_ij's
+    the dictionary stores keys that are w_ij's, and the values are the coefficient
+    prints it nicely
+    """
     s = ""
     for pair in d.keys():
         s += str(d[pair])
@@ -30,6 +35,13 @@ def printLinearComboW(d: dict, n: int) -> str:
     return s
 
 def printMatrixSummation(linearCombo: dict, matrixDict: dict, n: int) -> str:
+    """
+    takes a linear combination of matrices, and their w_ij's
+    both linearCombo and matrixDict use w_ij's as keys
+         the linearCombo associates each key with its coefficient
+         the matrixDict associates each key with its representation matrix
+    prints the linear combination nicely
+    """
     s = ""
     for pair in linearCombo.keys():
         s += str(linearCombo[pair])
@@ -39,6 +51,11 @@ def printMatrixSummation(linearCombo: dict, matrixDict: dict, n: int) -> str:
     return s
 
 def innerProductMatrices(m1: np.matrix, m2: np.matrix) -> float:
+    """
+    defines the inner product on matrices
+    simply multiples the entries of the matrices pointwise, and returns the sum
+    matrices act like vectors
+    """
     product = 0
     for i in range(m1.shape[0]):
         for j in range(m2.shape[1]):
@@ -85,4 +102,21 @@ def __main__():
         s += str(innerProductDict[pair]) + "\n"
     print(s)
 
-__main__()
+def Tmatrix(n: int) -> np.matrix:
+    result = np.zeros((math.factorial(n), n**2))
+    listOfPairs = []
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            listOfPairs += [(i, j)]
+    
+    row = 0
+    for sigma in Permutation.group(n):
+        for col in range(n**2):
+            result[row, col] = w_ij(listOfPairs[col][0], listOfPairs[col][1])(sigma, n)
+        row += 1
+
+    return result
+
+def TadjointTmat(n: int) -> np.matrix:
+    T = Tmatrix(n)
+    return np.matmul(T.transpose(), T)
