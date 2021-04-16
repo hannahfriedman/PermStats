@@ -27,6 +27,16 @@ def matlab_syntax(mat):
             string += ";"
     print(string)
 
+def latex_syntax(mat):
+    string = ""
+    for row in range(mat.shape[0]):
+        for col in range(mat.shape[1]):
+            string += str(mat[row, col])
+            string += " & "
+        string += "\\\ \n"
+    string = string[:-4]   # to remove last end line
+    print(string)
+
 def normalize(mat, stat):
     for row in range(mat.shape[0]):
         for col in range(mat.shape[1]):
