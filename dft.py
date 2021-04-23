@@ -88,7 +88,7 @@ def factor_sn(n: int) -> list:
             curr_coset = []
         return sn        
 
-def matrix_rep_gen(n):
+def matrix_rep_gen(n: int) -> dict:
     """
     n--int n in S_n
     returns a dict that maps the generators of S_n to their orthogonal matrix representations
@@ -96,51 +96,60 @@ def matrix_rep_gen(n):
     partitions = sort_partitions(generate_partitions(n))
     tableaux_by_shape = [Tableau.gen_by_shape(n, partition) for partition in partitions]
     rho = {}
+    # Loop over numbers 1 through n-1 to represent adjacent transpositions (1,2) to (n-1,n)
     for i in range(1,n):
         representation = []
         for shape in tableaux_by_shape:
             Tableau.sort(shape)
-            rep = np.zeros((len(shape), len(shape)))
-            for index in range(len(shape)):
-                tableau = Tableau(shape[index].data)
-                rep[index, index] = 1/(tableau.signed_distance(i))
-                switched = tableau.switch(i)
-                if switched.is_standard():
+            rep = np.zeros((len(shape), len(shape))) # Representations are indexed by standard tableaux of a given shape
+            for index in range(len(shape)):          # Loop over tableaux to fill in matrices
+                tableau = Tableau(shape[index].data) # Create a temporary variable name for the current tableau
+                rep[index, index] = 1/(tableau.signed_distance(i))  # Diagonal matrix entries
+                switched = tableau.switch(i)         # Apply the transposition to the tableau
+                if switched.is_standard():           # If the result is a standard tableau...
                     switched_index = 0
-                    for j in range(len(shape)):
-                        if shape[j] == switched:
+                    for j in range(len(shape)):     # Find the index of the resulting standard tableau
+                        if shape[j] == switched:  
                             switched_index = j
                             break
-                    rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))**(-2))
-            representation.append(rep)
-        rho[Permutation.cycle(i, i+1)] = representation
+                    rep[switched_index, index] = math.sqrt(1 - (shape[index].signed_distance(i))**(-2)) # Fill the entry indexed by the current tableau and the switched tableau
+            representation.append(rep) # Add this representation to the list of representations
+        rho[Permutation.cycle(i, i+1)] = representation # Add representation to dictionary
     return rho
 
-def generate_partitions(n):
+def generate_partitions(n: int) -> list:
     '''
     Generates all partitions of size n
     Returns a list of lists, showing the size of each partition
+    Works recursively
     '''
     ans = []
+    # Base case 1
     if n == 1:
         return [[1]]
+    # Base case 2
     elif n == 0:
         return [[]]
+    # Convert all partitions of integers smaller than n to partitions of n by adding the 
+    # necessary value
     for x in range(1, n):
         ans += [[x] + part for part in generate_partitions(n-x)]
+    # Remove duplicates and append the partition [n], which is not accounted for above
     return remove_dubs(ans) + [[n]]
 
 def sort_partitions(partitions: list) -> list:
     '''
-    sort partitions according to dominance order, in descending order
+    sort partitions according to dominance order, in descending order using bubble sort
     '''
     switched = True
     while switched:
         switched = False
+        # Loop over all partitions
         for i in range(len(partitions)-1):
-            if compare_partitions(partitions[i+1], partitions[i]):
+            # If  adjacent partitions are not in the right order, switch them
+            if compare_partitions(partitions[i+1], partitions[i]): 
                 partitions[i], partitions[i+1] = partitions[i+1], partitions[i]
-                switched = True
+                switched = True # We haven't finished sorting yet
     return partitions
 
 def compare_partitions(partition1: list, partition2: list) -> bool:
@@ -155,21 +164,23 @@ def compare_partitions(partition1: list, partition2: list) -> bool:
         if sum1 != sum2:
             return sum1 > sum2
 
-def remove_dubs(partition):
+def remove_dubs(partition: list) -> list:
     ''' 
     Removes duplicates in a list of lists
     Makes sure that any inner lists are sorted first (treats inner lists as multi-sets)
     ''' 
+    # Sort all the partitions and then put them in descending order
     for part in partition:
         part.sort()
         part.reverse()
+    # Adds only unique partitions to result and returns
     result = []
     for part in partition:
         if part not in result:
             result.append(part)
     return result
 
-
+# This function is unnecessary 
 def matrix_rep_transpositions(n):
     """
     n--int n in S_n
@@ -193,21 +204,7 @@ def matrix_rep_transpositions(n):
                                     matrix_factor1[i])
                                     for i in range(len(matrix_factor1))]
             rho[permutation] = matrix_rep
-    
     # Matrix representation for the rest
     return rho
 
-def __main__():
-    """
-    rho = matrix_rep(3)
-    print(rho)
-    sn = Permutation.group(3)
-    for sigma in sn:
-    print(rho[sigma][1])"""
-    dft(perm_stats.length, 6)
 
-
-__main__()
-
-for mat in dft(perm_stats.major_index, 5):
-    print(mat)

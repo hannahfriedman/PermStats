@@ -12,10 +12,6 @@ from permutation import Permutation
 
 #To do: we care about the matrix phi* m^n phi
 
-
-
-
-
 def normalized_DFT_excedances(n):
     """
     n--int n in S_n
