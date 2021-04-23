@@ -120,3 +120,16 @@ def Tmatrix(n: int) -> np.matrix:
 def TadjointTmat(n: int) -> np.matrix:
     T = Tmatrix(n)
     return np.matmul(T.transpose(), T)
+
+def TmatTstar(n: int) -> np.matrix:
+    T = Tmatrix(n)
+    return np.matmul(T, T.transpose())
+
+def w_ij_vector(i: int, j: int, n: int) -> np.matrix:
+    M = np.zeros((math.factorial(n), 1))
+    row = 0
+    w_ij_function = w_ij(i, j)
+    for sigma in Permutation.group(n):
+        M[row, 0] = w_ij_function(sigma, n)
+        row += 1
+    return M
