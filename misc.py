@@ -1,5 +1,6 @@
 from permutation import Permutation
 import math
+import numpy as np
 
 def wolfram_syntax(mat: np.array) -> None:
     string = "{"

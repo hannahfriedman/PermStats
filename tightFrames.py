@@ -133,3 +133,19 @@ def w_ij_vector(i: int, j: int, n: int) -> np.matrix:
         M[row, 0] = w_ij_function(sigma, n)
         row += 1
     return M
+
+A3 = Tmatrix(3).transpose()
+A3t = Tmatrix(3)
+AtA3 = np.matmul(A3t, A3)
+
+A4 = Tmatrix(4).transpose()
+A4t = Tmatrix(4)
+AtA4 = np.matmul(A4t, A4)
+
+A5 = Tmatrix(5).transpose()
+A5t = Tmatrix(5)
+AtA5 = np.matmul(A5t, A5)
+
+A6 = Tmatrix(6).transpose()
+A6t = Tmatrix(6)
+AtA6 = np.matmul(A6t, A6)
