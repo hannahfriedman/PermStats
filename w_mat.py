@@ -11,6 +11,7 @@ def w_ij_mat(sigma: Permutation, n: int) -> np.array:
     mat = np.zeros((n,n))
     for i in range(1, n+1):
         for j in range(1, n+1):
+            # i represents the rows, j represents the columns
             mat[i-1, j-1] = perm_stats.w_ij(i,j)(sigma,n)
     return mat
 
