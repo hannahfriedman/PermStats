@@ -3,7 +3,7 @@ import w_mat
 from permutation import Permutation
 import numpy as np
 
-import random
+from random import *
 import math
 
 def printOneLineNotation(sigma: Permutation, n: int) -> str:
@@ -149,3 +149,39 @@ AtA5 = np.matmul(A5t, A5)
 A6 = Tmatrix(6).transpose()
 A6t = Tmatrix(6)
 AtA6 = np.matmul(A6t, A6)
+
+def testDecompression(n: int) -> None:
+    """
+    testing our decompression formula to make sure it works
+    """
+    
+    TnStar = Tmatrix(n)
+    Tn = TnStar.transpose()
+    a_vector = np.ones((math.factorial(n), 1))
+    
+    for runs in range(30):
+        v = {}
+        MAX_COEFF = 420
+        for i in range(1, n+1):
+            for j in range(1, n+1):
+                v[(i, j)] = randint(0, MAX_COEFF)
+
+        v_vector = np.zeros((math.factorial(n), 1))
+        for pair in v.keys():
+            v_vector += v[pair] * w_ij_vector(pair[0], pair[1], n)
+
+        u_vector = Tn @ v_vector
+
+        sum_u = u_vector.sum()
+
+        prediction = 1/math.factorial(n) * ( (n - 1) * TnStar @ u_vector - (n - 2) * sum_u/n * a_vector )
+
+        # print("v linear combo is: " + printLinearComboW(v, n))
+
+        if v_vector.all() != prediction.all():
+            print("v linear combo is: " + printLinearComboW(v, n))
+            print("v vector is: " + np.array2string(v_vector))
+            print("prediction is: " + np.array2string(prediction))
+            break
+
+    print("All Success!")
