@@ -211,4 +211,8 @@ def TstarT(n: int) -> np.matrix:
     T = TmatrixW_ij_kl(n)
     return T.transpose() @ T
 
-print(np.linalg.eig(TstarT(5))[0])
+for eig in np.linalg.eigh(TstarT(6))[0]:
+    print(round(eig))
+
+for eig in np.linalg.eigh(TmatTstar(6))[0]:
+    print(round(eig))
