@@ -1,4 +1,5 @@
 from perm_stats import w_ij
+from perm_stats import w_ij_kl
 import w_mat
 from permutation import Permutation
 import numpy as np
@@ -117,6 +118,7 @@ def Tmatrix(n: int) -> np.matrix:
 
     return result
 
+
 def TadjointTmat(n: int) -> np.matrix:
     T = Tmatrix(n)
     return np.matmul(T.transpose(), T)
@@ -185,3 +187,28 @@ def testDecompression(n: int) -> None:
             break
 
     print("All Success!")
+
+
+
+def TmatrixW_ij_kl(n: int) -> np.matrix:
+    result = np.zeros(((n*(n-1))**2, math.factorial(n)))
+    listOfQuads = []
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            if (i != j):
+                for k in range(1, n+1):
+                    for l in range(1, n+1):
+                        if (l != k):
+                            listOfQuads += [(i, j, k, l)]
+    col = 0
+    for sigma in Permutation.group(n):
+        for row in range((n*(n-1))**2):
+            result[row, col] = w_ij_kl(listOfQuads[row][0], listOfQuads[row][1], listOfQuads[row][2], listOfQuads[row][3])(sigma, n)
+        col += 1
+    return result
+
+def TstarT(n: int) -> np.matrix:
+    T = TmatrixW_ij_kl(n)
+    return T.transpose() @ T
+
+print(np.linalg.eig(TstarT(5))[0])
