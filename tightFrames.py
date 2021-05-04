@@ -211,8 +211,18 @@ def TstarT(n: int) -> np.matrix:
     T = TmatrixW_ij_kl(n)
     return T.transpose() @ T
 
-for eig in np.linalg.eigh(TstarT(6))[0]:
-    print(round(eig))
+# for eig in np.linalg.eigh(TstarT(6))[0]:
+    # print(round(eig))
 
-for eig in np.linalg.eigh(TmatTstar(6))[0]:
-    print(round(eig))
+# for eig in np.linalg.eigh(TmatTstar(6))[0]:
+    # print(round(eig))
+
+def uniqueEigs(m: np.matrix) -> list:
+    dictOfEigs = {}
+    for eig in np.linalg.eigh(m)[0]:
+        roundedEig = round(eig)
+        if roundedEig not in dictOfEigs.keys():
+            dictOfEigs[roundedEig] = 1
+        else:
+            dictOfEigs[roundedEig] += 1
+    return dictOfEigs
