@@ -226,3 +226,25 @@ def uniqueEigs(m: np.matrix) -> list:
         else:
             dictOfEigs[roundedEig] += 1
     return dictOfEigs
+
+
+
+def w_ij_kl_vector(i: int, j: int, k:int, l:int, n: int) -> np.matrix:
+    M = np.zeros((math.factorial(n), 1))
+    row = 0
+    w_ij_kl_function = w_ij_kl(i, j, k, l)
+    for sigma in Permutation.group(n):
+        M[row, 0] = w_ij_kl_function(sigma, n)
+        row += 1
+    return M
+
+vec1 = w_ij_kl_vector(1,2,3,4,5)
+vec2 = w_ij_kl_vector(3,4,1,2,4)
+vec3 = w_ij_kl_vector(3,2,3,1,4)
+
+tstart_four = TstarT(5)
+
+
+print(tstart_four @ vec1)
+# print(tstart_four @ vec2)
+# print(tstart_four @ vec3)
