@@ -7,6 +7,9 @@ import numpy as np
 from random import *
 import math
 
+#------------------------------------------------------------------------------------
+## Print Functions
+
 def printOneLineNotation(sigma: Permutation, n: int) -> str:
     """
     prints the permutation sigma using one line notation
@@ -50,6 +53,8 @@ def printMatrixSummation(linearCombo: dict, matrixDict: dict, n: int) -> str:
         s += " + \n"
     s = s[:-4] # removes last plus
     return s
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
 
 def innerProductMatrices(m1: np.matrix, m2: np.matrix) -> float:
     """
@@ -62,7 +67,6 @@ def innerProductMatrices(m1: np.matrix, m2: np.matrix) -> float:
         for j in range(m2.shape[1]):
             product += m1[i, j] * m2[i, j]
     return product
-
 
 def __main__():
     n = 3
@@ -103,83 +107,102 @@ def __main__():
         s += str(innerProductDict[pair]) + "\n"
     print(s)
 
-def Tmatrix(n: int) -> np.matrix:
-    result = np.zeros((math.factorial(n), n**2))
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+# wij functions
+
+def T_w_ij(n: int) -> np.matrix:
+    '''
+    Returns an n^2 x n! matrix whose row vectors are wij functions ordered as
+    (1,1), (1,2), ..., (1,n), (2, 1), ..., (2, n), ..., (n, 1), ..., (n,n)
+    The columns are indexed by elements of Sn
+    '''
+    result = np.zeros((n**2, math.factorial(n)))
+
+    # we will use these pairs to create our wij functions
     listOfPairs = []
     for i in range(1, n+1):
         for j in range(1, n+1):
             listOfPairs += [(i, j)]
     
-    row = 0
+    col = 0
+    # Loop over columns
     for sigma in Permutation.group(n):
-        for col in range(n**2):
+        # Loop over rows
+        for row in range(n**2):
             result[row, col] = w_ij(listOfPairs[col][0], listOfPairs[col][1])(sigma, n)
-        row += 1
+        col += 1
 
     return result
 
-
-def TadjointTmat(n: int) -> np.matrix:
-    T = Tmatrix(n)
-    return np.matmul(T.transpose(), T)
-
-def TmatTstar(n: int) -> np.matrix:
-    T = Tmatrix(n)
-    return np.matmul(T, T.transpose())
+def TstarT_w_ij(n: int) -> np.matrix:
+    '''
+    Returns the matrix T*T. Since T is a real matrix, T* is just T transpose.
+    '''
+    T = Tmatrix_w_ij(n)
+    return T.transpose() @ T
 
 def w_ij_vector(i: int, j: int, n: int) -> np.matrix:
+    '''
+    Returns w_ij as a vector indicator function on Sn
+    '''
     M = np.zeros((math.factorial(n), 1))
     row = 0
     w_ij_function = w_ij(i, j)
+    # Each entry in the vector represents a permutation
     for sigma in Permutation.group(n):
         M[row, 0] = w_ij_function(sigma, n)
         row += 1
     return M
 
-A3 = Tmatrix(3).transpose()
-A3t = Tmatrix(3)
-AtA3 = np.matmul(A3t, A3)
+## Generate T matrices for S3 - S6 ##
+# A3 = T_w_ij(3)
+# A3t = T_w_ij(3).transpose()
+# AtA3 = TstarT_w_ij(3)
 
-A4 = Tmatrix(4).transpose()
-A4t = Tmatrix(4)
-AtA4 = np.matmul(A4t, A4)
+# A4 = T_w_ij(4)
+# A4t = T_w_ij(4).transpose()
+# AtA4 = TstarT_w_ij(4)
 
-A5 = Tmatrix(5).transpose()
-A5t = Tmatrix(5)
-AtA5 = np.matmul(A5t, A5)
+# A5 = T_w_ij(5)
+# A5t = T_w_ij(5).transpose()
+# AtA5 = TstarT_w_ij(5)
 
-A6 = Tmatrix(6).transpose()
-A6t = Tmatrix(6)
-AtA6 = np.matmul(A6t, A6)
+# A6 = T_w_ij(6)
+# A6t = T_w_ij(6).transpose()
+# AtA6 = TstarT_w_ij(6)
 
 def testDecompression(n: int) -> None:
     """
-    testing our decompression formula to make sure it works
+    Test our decompression on NUM_TESTS different random vectors which are linear combinations of wij functions
     """
-    
-    TnStar = Tmatrix(n)
-    Tn = TnStar.transpose()
+    Tn = T_w_ij(n)
+    TnStar = Tn.transpose()
     a_vector = np.ones((math.factorial(n), 1))
+    NUM_TESTS = 30
     
-    for runs in range(30):
+    for runs in range(NUM_TESTS):
+        # v is a dictionary with keys being 2-element tuples representing wij functions and keys being the coefficients
         v = {}
         MAX_COEFF = 420
+        # Generate a random vector v
         for i in range(1, n+1):
             for j in range(1, n+1):
                 v[(i, j)] = randint(0, MAX_COEFF)
 
+        # Convert v into an np array
         v_vector = np.zeros((math.factorial(n), 1))
         for pair in v.keys():
             v_vector += v[pair] * w_ij_vector(pair[0], pair[1], n)
 
+        # Compute the compression u
         u_vector = Tn @ v_vector
 
+        # Decompress u
         sum_u = u_vector.sum()
-
         prediction = 1/math.factorial(n) * ( (n - 1) * TnStar @ u_vector - (n - 2) * sum_u/n * a_vector )
 
-        # print("v linear combo is: " + printLinearComboW(v, n))
-
+        # Print statements in case something goes wrong
         if v_vector.all() != prediction.all():
             print("v linear combo is: " + printLinearComboW(v, n))
             print("v vector is: " + np.array2string(v_vector))
@@ -189,62 +212,120 @@ def testDecompression(n: int) -> None:
     print("All Success!")
 
 
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+# wijkl functions
 
-def TmatrixW_ij_kl(n: int) -> np.matrix:
+
+def T_w_ij_kl(n: int) -> np.matrix:
+    '''
+    Returns an (n(n-1))^2 x n! matrix whose row vectors are wijkl functions ordered as
+    (1,2,1,2), (1,2,1,3), ..., (1,2,1,n), (1,2,2,1), ..., (1,2,n,n-1), (1,3,1,2) ..., (1,n,n,n-1), ..., (2,1,1,2), ..., (n,n-1,n,n-1)
+    The columns are indexed by elements of Sn
+    '''
     result = np.zeros(((n*(n-1))**2, math.factorial(n)))
+
+     # we will use these 4-element tuples to create our wijkl functions
     listOfQuads = []
     for i in range(1, n+1):
         for j in range(1, n+1):
-            if (i != j):
+            if (i != j): # Avoid repetition in first pair
                 for k in range(1, n+1):
                     for l in range(1, n+1):
-                        if (l != k):
+                        if (l != k): # Avoid repetition in second pair
                             listOfQuads += [(i, j, k, l)]
     col = 0
+    # Loop over columns
     for sigma in Permutation.group(n):
+        # Loop over rows
         for row in range((n*(n-1))**2):
             result[row, col] = w_ij_kl(listOfQuads[row][0], listOfQuads[row][1], listOfQuads[row][2], listOfQuads[row][3])(sigma, n)
         col += 1
     return result
 
-def TstarT(n: int) -> np.matrix:
-    T = TmatrixW_ij_kl(n)
+def TstarT_w_ij_kl(n: int) -> np.matrix:
+    '''
+    Returns the matrix T*T. Since T is a real matrix, T* is just T transpose.
+    '''
+    T = T_w_ij_kl(n)
     return T.transpose() @ T
-
-# for eig in np.linalg.eigh(TstarT(6))[0]:
-    # print(round(eig))
-
-# for eig in np.linalg.eigh(TmatTstar(6))[0]:
-    # print(round(eig))
-
-def uniqueEigs(m: np.matrix) -> list:
-    dictOfEigs = {}
-    for eig in np.linalg.eigh(m)[0]:
-        roundedEig = round(eig)
-        if roundedEig not in dictOfEigs.keys():
-            dictOfEigs[roundedEig] = 1
-        else:
-            dictOfEigs[roundedEig] += 1
-    return dictOfEigs
-
 
 
 def w_ij_kl_vector(i: int, j: int, k:int, l:int, n: int) -> np.matrix:
+    '''
+    Returns w_ij_kl as a vector indicator function on Sn
+    '''
     M = np.zeros((math.factorial(n), 1))
-    row = 0
     w_ij_kl_function = w_ij_kl(i, j, k, l)
+    # Each entry represents a permutation
+    row = 0
     for sigma in Permutation.group(n):
         M[row, 0] = w_ij_kl_function(sigma, n)
         row += 1
     return M
 
-vec1 = w_ij_kl_vector(1,2,3,4,5)
-vec2 = w_ij_kl_vector(3,4,1,2,4)
-vec3 = w_ij_kl_vector(3,2,3,1,4)
+def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
+    '''
+    Returns the permutation representation (n! x n! matrix) of sigma
+    Complexity: O(n!)
+    '''
+    # Permutations in Sn index the rows and columns of the matrix. We use a dictionary
+    # to keep track of which row/column a permutatation is associated with
+    sn_dict = {}
+    index = 0
+    for tau in Permutation.group(n):
+        sn_dict[tau] = index
+        index += 1
+    
+    mat = np.zeros((math.factorial(n), math.factorial(n)))
+    for tau in Permutation.group(n):
+        pi = tau * sigma
+        mat[sn_dict[pi], sn_dict[tau]] = 1
+    return mat
 
-tstart_four = TstarT(5)
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+# Testing our conjecture for wijkl compression for small n
 
+# n = 6
+# tstart= TstarT(n)
 
-print(tstart_four @ vec1)
-# print(tstart_four @ vec2)
-# print(tstart_four @ vec3)
+# Elements that fix n elements (identity)
+# I = transposition_matrix(Permutation(), n)
+
+# Elements that fix n-2 elements
+# mat2 = np.zeros((math.factorial(n), math.factorial(n)))
+# for i in range(1, n):
+#     for j in range(i+1,n+1):
+#         mat2 += transposition_matrix(Permutation.from_cycles([j,i]), n)
+
+# Elements that fix n-3 elements
+# mat3 = np.zeros((math.factorial(n), math.factorial(n)))
+# for i in range(1, n-1):
+#     for j in range(i+1,n):
+#         for k in range(j+1, n+1):
+#             mat3 += transposition_matrix(Permutation.from_cycles([i,j,k]), n)
+#             mat3 += transposition_matrix(Permutation.from_cycles([i,k,j]), n)
+
+# Elements that fix n-4 elements
+# mat4 = np.zeros((math.factorial(n), math.factorial(n)))
+# for i in range(1, n-2):
+#     for j in range(i+1,n-1):
+#         for k in range(j+1, n):
+#             for l in range(k+1, n+1):
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,j,k,l]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,j,l,k]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,k,j,l]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,k,l,j]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,l,j,k]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,l,k,j]), n)
+
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,j], [k,l]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,k], [j,l]), n)
+#                 mat4 += transposition_matrix(Permutation.from_cycles([i,l], [j,k]), n)
+
+# print(np.array_equal(tstart - 2*mat2 - 6*I, np.zeros((math.factorial(n), math.factorial(n)))))
+# print(np.array_equal(tstart - 6*mat2 - 2*mat3 - 12*I, np.zeros((math.factorial(n), math.factorial(n)))))
+# print(np.array_equal(tstart - 12*mat2 - 6*mat3 - 2*mat4 - 30*I, np.zeros((math.factorial(n), math.factorial(n)))))
+
+#------------------------------------------------------------------------------------

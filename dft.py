@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import matrix_power
 import math
 import copy
-from Tableau import Tableau
+from tableau import Tableau
 from permutation import Permutation
 from misc import matlab_syntax
 from misc import adjust_zeros
@@ -37,7 +37,7 @@ def matrix_rep(n: int) -> dict:
     n--int n in S_n
     returns a dict every permutation in Sn to it's orthogonal matrix representation
     """
-    # Create dictionary representation the DFT for the generates of SN (adjacent transpositions)
+    # Create dictionary representation the DFT for the generates of Sn (adjacent transpositions)
     rho_gen = matrix_rep_gen(n)
     rho = {}
     # Creates a list of lists of permutation in Sn factored into adjacent transpositions
@@ -51,10 +51,10 @@ def matrix_rep(n: int) -> dict:
             val.append(matrix_power(mat, 2))
         # For each factor, multiply by the appropriate matrix
         for transposition in sigma:
-            if sigma != Permutation(): # don't use the identity because we don't have a matrix representation for it
+            if transposition != Permutation(): # don't use the identity because we don't have a matrix representation for it
                 key *= transposition
                 for i in range(len(val)):
-                    val[i] = np.matmul(val[i], rho_gen[transposition][i])
+                    val[i] = val[i] @ rho_gen[transposition][i]
         rho[key] = val # Add key and value to map
     return rho
 
@@ -208,3 +208,5 @@ def matrix_rep_transpositions(n):
     return rho
 
 
+for mat in dft(perm_stats.major_index, 4):
+    print(mat)

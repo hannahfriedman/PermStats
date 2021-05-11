@@ -67,3 +67,19 @@ def falling_factorial(n: int, k:int) -> int:
         product *= n
         n -= 1
     return product
+
+def eigMultiplicity(m: np.matrix) -> dict:
+    """
+    Returns a dictionary, the keys of which are eigenvalues and the values of which are the eigenvalue's
+    multiplicity
+    """
+    dictOfEigs = {}
+    eigs = np.linalg.eig(m)[0]
+    # Add each eigenvalue to the dictionary
+    for eig in eigs:
+        roundedEig = round(eig)
+        if roundedEig not in dictOfEigs.keys():
+            dictOfEigs[roundedEig] = 1
+        else:
+            dictOfEigs[roundedEig] += 1
+    return dictOfEigs

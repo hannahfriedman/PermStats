@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import matrix_power
 import math
 import copy
+from typing import Type
 
 
 class Tableau(object):
@@ -27,7 +28,7 @@ class Tableau(object):
             s += "\n"
         return s
     
-    def compare_helper(self, other: Tableau, n: int) -> bool:
+    def compare_helper(self, other: "Tableau", n: int) -> bool:
         '''
         Helper function for > operator
         '''
@@ -45,7 +46,7 @@ class Tableau(object):
     def __eq__(self, other):
         return self.data == other.data
 
-    def find(self, k: int) -> int, int:
+    def find(self, k: int) -> (int, int):
         for row in range(len(self.data)):
             for col in range(len(self.data[row])):
                 if self.data[row][col] == k:
@@ -84,7 +85,7 @@ class Tableau(object):
                     return False
         return True
 
-    def switch(self, k: int) -> Tableau:
+    def switch(self, k: int) -> "Tableau":
         """
         Return a deep copy of the tableau with k and k+1 switched
         Requires k to be in the tableau

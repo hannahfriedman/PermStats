@@ -35,7 +35,7 @@ def w_ij_kl_mat(sigma: Permutation, n: int) -> np.array:
                 shift_ij += 1
     return mat
 
-def w_mat_sn(w: Callable[[Permutation, int], int], n: int) -> dict:
+def w_mat_sn(w: Callable[[Permutation, int], np.array], n: int) -> dict:
     """
     Returns a dictionary of w-representations of permutations in Sn 
     w should be either w_ij_mat or w_ij_kl_mat
