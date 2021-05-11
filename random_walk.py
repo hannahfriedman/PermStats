@@ -9,6 +9,10 @@ import misc
 ###------------------------------------------------------------------------------------
 #Generate w_ij, w_ij_kl matrices for Sn
 def w_ij_mat(sigma: Permutation, n: int) -> np.array:
+    '''
+    Create an n x n representation of sigma
+    This representation contains the trivial and (n-1, 1) representations
+    '''
     mat = np.zeros((n,n))
     for i in range(1, n+1):
         for j in range(1, n+1):
@@ -17,6 +21,10 @@ def w_ij_mat(sigma: Permutation, n: int) -> np.array:
     return mat
 
 def w_ij_kl_mat(sigma: Permutation, n: int) -> np.array:   
+    '''
+    Create a representation of sigma
+    This representation contains the (n), (n-1, 1), (n-2, 2), (n-2, 1, 1) representations
+    '''
     dim = misc.falling_factorial(n, n-2) 
     mat = np.zeros((dim, dim))
     shift_ij = 1  # keep track of how much our index differs if we used (i,i) pairs
