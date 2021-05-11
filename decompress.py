@@ -7,55 +7,7 @@ import numpy as np
 from random import *
 import math
 
-#------------------------------------------------------------------------------------
-## Print Functions
-
-def printOneLineNotation(sigma: Permutation, n: int) -> str:
-    """
-    prints the permutation sigma using one line notation
-    ex: [3 4 5 1 2]
-    """
-    s = "["
-    for i in range(1, n+1):
-        s += str(sigma(i))
-        s += " "
-    s = s[:-1] # remove last space
-    s += "]"
-    return s
-
-
-def printLinearComboW(d: dict, n: int) -> str:
-    """
-    takes a of w_ij's
-    the dictionary stores keys that are w_ij's, and the values are the coefficient
-    prints it nicely
-    """
-    s = ""
-    for pair in d.keys():
-        s += str(d[pair])
-        s += "(w_" + str(pair[0]) + "<-" + str(pair[1]) + ")"
-        s += " + "
-    s = s[:-3] # remove last plus
-    return s
-
-def printMatrixSummation(linearCombo: dict, matrixDict: dict, n: int) -> str:
-    """
-    takes a linear combination of matrices, and their w_ij's
-    both linearCombo and matrixDict use w_ij's as keys
-         the linearCombo associates each key with its coefficient
-         the matrixDict associates each key with its representation matrix
-    prints the linear combination nicely
-    """
-    s = ""
-    for pair in linearCombo.keys():
-        s += str(linearCombo[pair])
-        s += str(matrixDict[pair])
-        s += " + \n"
-    s = s[:-4] # removes last plus
-    return s
-#------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------
-
+###------------------------------------------------------------------------------------
 def innerProductMatrices(m1: np.matrix, m2: np.matrix) -> float:
     """
     defines the inner product on matrices
@@ -107,9 +59,9 @@ def __main__():
         s += str(innerProductDict[pair]) + "\n"
     print(s)
 
-#------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------
-# wij functions
+###------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
+## wij functions
 
 def T_w_ij(n: int) -> np.matrix:
     '''
@@ -212,9 +164,9 @@ def testDecompression(n: int) -> None:
     print("All Success!")
 
 
-#------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------
-# wijkl functions
+###------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
+## wijkl functions
 
 
 def T_w_ij_kl(n: int) -> np.matrix:
@@ -283,8 +235,8 @@ def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
         mat[sn_dict[pi], sn_dict[tau]] = 1
     return mat
 
-#------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
 # Testing our conjecture for wijkl compression for small n
 
 # n = 6
@@ -328,4 +280,51 @@ def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
 # print(np.array_equal(tstart - 6*mat2 - 2*mat3 - 12*I, np.zeros((math.factorial(n), math.factorial(n)))))
 # print(np.array_equal(tstart - 12*mat2 - 6*mat3 - 2*mat4 - 30*I, np.zeros((math.factorial(n), math.factorial(n)))))
 
-#------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------
+## Print Functions
+
+def printOneLineNotation(sigma: Permutation, n: int) -> str:
+    """
+    prints the permutation sigma using one line notation
+    ex: [3 4 5 1 2]
+    """
+    s = "["
+    for i in range(1, n+1):
+        s += str(sigma(i))
+        s += " "
+    s = s[:-1] # remove last space
+    s += "]"
+    return s
+
+
+def printLinearComboW(d: dict, n: int) -> str:
+    """
+    takes a of w_ij's
+    the dictionary stores keys that are w_ij's, and the values are the coefficient
+    prints it nicely
+    """
+    s = ""
+    for pair in d.keys():
+        s += str(d[pair])
+        s += "(w_" + str(pair[0]) + "<-" + str(pair[1]) + ")"
+        s += " + "
+    s = s[:-3] # remove last plus
+    return s
+
+def printMatrixSummation(linearCombo: dict, matrixDict: dict, n: int) -> str:
+    """
+    takes a linear combination of matrices, and their w_ij's
+    both linearCombo and matrixDict use w_ij's as keys
+         the linearCombo associates each key with its coefficient
+         the matrixDict associates each key with its representation matrix
+    prints the linear combination nicely
+    """
+    s = ""
+    for pair in linearCombo.keys():
+        s += str(linearCombo[pair])
+        s += str(matrixDict[pair])
+        s += " + \n"
+    s = s[:-4] # removes last plus
+    return s
+###------------------------------------------------------------------------------------

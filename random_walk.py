@@ -1,9 +1,10 @@
 from permutation import Permutation
 import matplotlib.pyplot as plt
+from typing import Callable
+
 import numpy as np
 import perm_stats
 import misc
-from typing import Callable
 
 ###------------------------------------------------------------------------------------
 #Generate w_ij, w_ij_kl matrices for Sn
@@ -47,7 +48,7 @@ def w_mat_sn(w: Callable[[Permutation, int], np.array], n: int) -> dict:
     return mats
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
-# Linear combinations of w matrices using coefficients
+# Generate matrix representations of functions on Sn
 def representation(function: Callable[[Permutation, int], int], 
                    w: Callable[[Permutation, int], np.array], 
                    dim: int, 
@@ -106,62 +107,18 @@ def rep_tau(tau: float, function: Callable[[Permutation, int], int], n: int) -> 
 
 def rep_w_ij(i: int, j: int, n: int) -> np.array:
     """
-    Generates linear combinations of w_ij matrices for convolving
+    Generates matrix representation of w_ij matrices for convolving
     """
     return representation(perm_stats.w_ij(i,j), w_ij_mat, n, n)
 
 def rep_w_ij_kl(i: int, j: int, k: int, l: int, n: int) -> np.array:
     """
-    Generates linear combinations of w_ij_kl matrices for convolving
+    Generates matrix representation of w_ij_kl matrices for convolving
     """
     return representation(perm_stats.w_ij_kl(i,j,k,l), w_ij_kl_mat, misc.falling_factorial(n, n-2), n)
-
-
-
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
-# Multiply w-matrices
-def convolve(n: int) -> list:
-    """
-    convolve all w_ij mats with all other w_ij mats in Sn
-    prints products
-    returns list containing all such matrices
-    """
-    mats = []
-    for i in range(1, n+1):
-        for j in range(1, n+1):
-            # ij_mat is on the left
-            ij_mat = rep_w_ij(i, j, n) 
-            for k in range(1, n+1):
-                for l in range(1, n+1):
-                    # kl_mat is on the right
-                    kl_mat = rep_w_ij(k, l, n)
-                    # print products and matrices
-                    print("w" + str(i) + str(j) + " * w" + str(k) + str(l) + ":")
-                    print(np.matmul(ij_mat, kl_mat))
-                    # add matrix to final list
-                    mats.append(np.matmul(ij_mat, kl_mat))
-    return mats
-
-def filter_unique(mats: list) -> list:
-    """
-    removes duplicate matrices from mats
-    """
-    used = []
-    for mat in mats:
-        in_list = False
-        for x in used:
-            if (mat == x).all():
-                in_list = True
-                break
-        if not in_list:
-            used.append(mat)
-    return used
-
-
-###------------------------------------------------------------------------------------
-###------------------------------------------------------------------------------------
-# Variation distance and Exponentiating
+# Variation distance and Exponentiating for Random Walks
 def var_dist(mat: np.array) -> float:
     """
     computes variation distance of a matrix 
@@ -223,21 +180,9 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
     mat1 = rep_w_ij(i, j, n)/2 + rep_w_ij(k,l, n)/2
     plot_var_dist(mat1, max_pow)
     
+###------------------------------------------------------------------------------------
 
 # Plot excedance random walk with various tau
 # for i in range(1,20):
 #     pvd(5, "length", 80, 1/i)
 # plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-

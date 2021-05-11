@@ -1,9 +1,8 @@
 import numpy as np
-from numpy.linalg import matrix_power
 import math
 import copy
+from numpy.linalg import matrix_power
 from typing import Type
-
 
 class Tableau(object):
     def __init__(self, data: list) -> None:
