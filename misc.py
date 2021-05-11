@@ -68,7 +68,7 @@ def falling_factorial(n: int, k:int) -> int:
         n -= 1
     return product
 
-def eigMultiplicity(m: np.matrix) -> dict:
+def eig_multiplicity(m: np.matrix) -> dict:
     """
     Returns a dictionary, the keys of which are eigenvalues and the values of which are the eigenvalue's
     multiplicity
