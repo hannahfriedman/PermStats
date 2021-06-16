@@ -3,6 +3,7 @@ from perm_stats import w_ij_kl
 import random_walk
 from permutation import Permutation
 import numpy as np
+import seaborn as sns
 
 from random import *
 import math

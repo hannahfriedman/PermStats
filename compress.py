@@ -2,6 +2,7 @@ import numpy as np
 from permutation import Permutation
 from typing import *
 import copy
+import misc
 
 def compress(sigma: Permutation, tuple_size: int, n: int) -> np.array:
     """
@@ -35,8 +36,21 @@ def generate_tuples(tuple_size: int, n: int) -> List[List[int]]:
                     result.append(temp)
         return result
 
+def w_rep(indices: List[int], images: List[int], n: int) -> np.array:
+    dim = misc.falling_factorial(n, n-len(indices))
+    mat = np.zeros((dim, dim))
+    for sigma in Permutation.group(n):
+        contained = True
+        for i in range(len(indices)):
+            if sigma(indices[i]) != images[i]:
+                contained = False
+                break
+        if contained:
+            mat += compress(sigma, len(indices), n)
+    return mat
+
 
 if __name__ == "__main__":
     sigma = Permutation(2,1)
-    print(compress(sigma, 2, 3))
+    print(w_rep([2,1,3],[1,2,3], 5)
 
