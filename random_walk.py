@@ -60,7 +60,8 @@ def w_mat_sn(w: Callable[[Permutation, int], np.array], n: int) -> dict:
 def representation(function: Callable[[Permutation, int], int], 
                    w: Callable[[Permutation, int], np.array], 
                    dim: int, 
-                   n: int) -> np.array:
+                   n: int, 
+                   normalize: bool) -> np.array:
     """
     Returns a linear combination of w_ij or w_ij_kl matrices 
     with coefficients being function of the permutation represented
@@ -75,7 +76,10 @@ def representation(function: Callable[[Permutation, int], int],
     mats = w_mat_sn(w, n)
     # Sum function evaluated for every permutation--used to scale so all rows
     # and columns of matrices sum to 1
-    tot = perm_stats.total(function, n)
+    if normalize:
+        tot = perm_stats.total(function, n)
+    else:
+        tot = 1
     mat = np.zeros((dim,dim))
     # Add matrices to mat after scaling them appropriately 
     for sigma in sn:
@@ -83,16 +87,16 @@ def representation(function: Callable[[Permutation, int], int],
         mat = mat + factor * mats[sigma]
     return mat
 
-def rep(function: Callable[[Permutation, int], int], n: int) -> np.array:
+def rep(function: str, n: int, normalize=True) -> np.array:
     '''
     User friendly version of representation function
     '''
     if function == "exced":
-        return representation(perm_stats.excedances, w_ij_mat, n, n)
+        return representation(perm_stats.excedances, w_ij_mat, n, n, normalize)
     if function == "major index":
-        return representation(perm_stats.major_index, w_ij_kl_mat, misc.falling_factorial(n, n-2), n)
+        return representation(perm_stats.major_index, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
     if function == "length":
-        return representation(perm_stats.length, w_ij_kl_mat, misc.falling_factorial(n, n-2), n)
+        return representation(perm_stats.length, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
 
 def rep_tau(tau: float, function: Callable[[Permutation, int], int], n: int) -> np.array:
     """
@@ -195,4 +199,5 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
 #     pvd(5, "length", 80, 1/i)
 # plt.show()
 
-print(w_ij_kl_mat(Permutation(2,1), 3))
+if __name__ == "__main__":
+    print(rep("major index", 4, False))
