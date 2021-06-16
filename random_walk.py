@@ -201,7 +201,7 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
 # plt.show()
 
 if __name__ == "__main__":
-    m = rep("major index", 4, False)
+    m = rep("length", 4, False)
     print(m)
-    ax = sns.heatmap(m, linewidth=0.5)
-    plt.show()
+    # ax = sns.heatmap(m, linewidth=0.5)
+    # plt.show()

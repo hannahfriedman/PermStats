@@ -16,7 +16,7 @@ def compress(sigma: Permutation, tuple_size: int, n: int) -> np.array:
     mat = np.zeros((len(indices), len(indices)))
     for index in indices:
         image = [sigma(i) for i in index]
-        mat[indices.index(index), indices.index(image)] = 1
+        mat[indices.index(image), indices.index(index)] = 1
     return mat
 
 def generate_tuples(tuple_size: int, n: int) -> List[List[int]]:
@@ -51,6 +51,8 @@ def w_rep(indices: List[int], images: List[int], n: int) -> np.array:
 
 
 if __name__ == "__main__":
-    sigma = Permutation(2,1)
-    print(w_rep([2,1,3],[1,2,3], 5)
+    for sigma in Permutation.group(3):
+        print(sigma)
+        print(compress(sigma, 1, 3))
+    # print(w_rep([2,1,3],[1,2,3], 5)
 
