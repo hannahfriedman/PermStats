@@ -1,6 +1,6 @@
 from perm_stats import w_ij
 from perm_stats import w_ij_kl
-import w_mat
+import random_walk
 from permutation import Permutation
 import numpy as np
 
@@ -28,12 +28,12 @@ def __main__():
     wijMatrices = {}
 
     for sigma in Permutation.group(n):
-        snMatrices[sigma] = w_mat.w_ij_mat(sigma, n)
+        snMatrices[sigma] = random_walk.w_ij_mat(sigma, n)
 
     linearCombWij = {}
     for i in range(1, n+1):
         for j in range(1, n+1):
-            wijMatrices[(i, j)] = w_mat.rep_w_ij(i, j, n) * math.factorial(n-1)
+            wijMatrices[(i, j)] = random_walk.rep_w_ij(i, j, n) * math.factorial(n-1)
             linearCombWij[(i, j)] = math.floor(random.random()*randMax)
     print("Linear Combo is: \n" + printLinearComboW(linearCombWij, n) + "\n")
     print("Intermediate: \n" + printMatrixSummation(linearCombWij, wijMatrices, n) + "\n")

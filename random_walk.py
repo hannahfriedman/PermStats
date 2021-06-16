@@ -194,3 +194,5 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
 # for i in range(1,20):
 #     pvd(5, "length", 80, 1/i)
 # plt.show()
+
+print(w_ij_kl_mat(Permutation(2,1), 3))
