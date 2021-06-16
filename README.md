@@ -1,6 +1,6 @@
 # PermStats
 
-This folder provides computational verification and background for some of the results in our paper on compression of permutation statistics.
+This folder provides computational verification and background for some of the results in our technical report on compression of permutation statistics.
 
 convolve_w_ij: provides evidence for result describing the convolution of w_ij functions.
 
