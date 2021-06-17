@@ -201,7 +201,12 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
 # plt.show()
 
 if __name__ == "__main__":
-    m = rep("length", 4, False)
-    print(m)
+    # m = rep("exced", 3, False)
+    # print(m)
     # ax = sns.heatmap(m, linewidth=0.5)
     # plt.show()
+    count = 0
+    for sigma in Permutation.group(4):
+        if perm_stats.excedances(sigma, 4) == 2:
+            count += 1
+    print(count)
