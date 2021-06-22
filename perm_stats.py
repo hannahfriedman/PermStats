@@ -30,6 +30,17 @@ def length(sigma: Permutation, n: int) -> int:
     """
     return sigma.inversions()
 
+def count_occurrences(sigma: Permutation, tau: Permutation, n: int, k: int) -> int:
+    """
+    Arguments: sigma, a permutation in Sn
+               tau, a permutation in Sk
+               k <= n
+    Returns: the number of occurrences of tau in sigma
+    """
+    return
+
+
+
 def w_ij(i: int, j: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij function
