@@ -78,7 +78,19 @@ class Path:
     def __iter__(self):
         return iter(self.data)
     def __repr__(self):
-        return str(self.data)
+        if self.data == []:
+            return "{" + "}"
+        if len(self.data) == 1:
+            return "{" + str(self.data[0]) + "}"
+        s = "{" + str(self.data[0])
+        for i in self.data[1:]:
+            s += ", " 
+            s += str(i)
+        s += "}"
+        return s
+
+        
+  
 
 def num_excedances(mat: np.array) -> dict:
     d = {}
@@ -123,7 +135,7 @@ def helper(n: int, d: dict, all_sets: List[Path], k: int, path_tracker: List[Tup
 def num_patterns(sigma: Permutation, k: int, n: int) -> dict:
     col_indices = tuples_w_relative_order(range(1, k+1), k, n)
     row_indices = tuples_w_relative_order(sigma, k, n)
-    max_path_length = 10
+    max_path_length = 6
     all_sets = find_all_sets_patterns(sigma, col_indices, row_indices, k, n, max_path_length)
     d = {}
     path_tracker = []
@@ -143,6 +155,7 @@ def patterns_helper(d: dict,
     if k == max_path_length:
         for path in all_sets:
             if len(path) == k:
+                print(path)
                 num_permutations = math.factorial(find_num_free(path, col_indices, n))
                 d[k] += num_permutations
                 path_tracker.append((path, num_permutations))
@@ -306,6 +319,9 @@ def same_contents(a: list, b: list):
             return False
     return True
 
+
+
+
 if __name__ == "__main__":
     m = rep("exced", 5, False)
     # print(num_excedances(m))
@@ -323,15 +339,15 @@ if __name__ == "__main__":
     # a = [1,2,3]
     # b = [2,3,1]
     k = 2
-    n = 5
+    n = 4
     sigma = Permutation(2, 1)
-    print(num_patterns(sigma, k, n))
+    # print(num_patterns(sigma, k, n))
     # col_indices = tuples_w_relative_order(list(range(1, k+1)), k, n)
     # row_indices = tuples_w_relative_order(sigma, k, n)
     # print(col_indices)
     # print(row_indices)
     # print(compatible([1, 5, 4], [2, 4, 3], [1, 2, 5], [2, 4, 5]))
-    # all_sets = find_all_sets_patterns(sigma, col_indices, row_indices, k, n, 1)
+    # all_sets = find_all_sets_patterns(sigma, col_indices, row_indices, k, n, 6)
     # print(len(all_sets))
     # for path in all_sets:
     #     if len(path) == 2:
