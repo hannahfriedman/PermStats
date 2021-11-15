@@ -68,6 +68,11 @@ def falling_factorial(n: int, k:int) -> int:
         n -= 1
     return product
 
+def choose(n: int, k: int) -> int:
+    if k > n:
+        return 0
+    return falling_factorial(n, k)//math.factorial(n - k)
+
 def eig_multiplicity(m: np.matrix) -> dict:
     """
     Returns a dictionary, the keys of which are eigenvalues and the values of which are the eigenvalue's

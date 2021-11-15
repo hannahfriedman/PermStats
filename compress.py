@@ -155,9 +155,10 @@ def patterns_helper(d: dict,
     if k == max_path_length:
         for path in all_sets:
             if len(path) == k:
-                print(path)
+                # print(path)
                 num_permutations = math.factorial(find_num_free(path, col_indices, n))
                 d[k] += num_permutations
+                # print(f"length {k}: {num_permutations} permutations")
                 path_tracker.append((path, num_permutations))
     else:
         patterns_helper(d, all_sets, k+1, col_indices, path_tracker, max_path_length, n)
@@ -170,7 +171,13 @@ def patterns_helper(d: dict,
                         for pair in path_tracker:
                             if pair[0] == super_set:
                                 diff += pair[1]
+                # print(f"length {k}: {num_permutations} permutations before subtraction")
                 num_permutations -= diff
+                # print(f"length {k}: {num_permutations} permutations")
+                if k == 2:
+                    for step in path:
+                        print(col_indices[step[1]], end='')
+                    print('\n')
                 d[k] += num_permutations
                 path_tracker.append((path, num_permutations))
 
@@ -323,7 +330,7 @@ def same_contents(a: list, b: list):
 
 
 if __name__ == "__main__":
-    m = rep("exced", 5, False)
+    # m = rep("length", 4, False)
     # print(num_excedances(m))
     # print(m)
     # d = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0}
@@ -338,16 +345,27 @@ if __name__ == "__main__":
     # print(dict(zip(d,range(len(d)))))
     # a = [1,2,3]
     # b = [2,3,1]
-    k = 2
-    n = 4
-    sigma = Permutation(2, 1)
-    # print(num_patterns(sigma, k, n))
-    # col_indices = tuples_w_relative_order(list(range(1, k+1)), k, n)
-    # row_indices = tuples_w_relative_order(sigma, k, n)
-    # print(col_indices)
-    # print(row_indices)
-    # print(compatible([1, 5, 4], [2, 4, 3], [1, 2, 5], [2, 4, 5]))
-    # all_sets = find_all_sets_patterns(sigma, col_indices, row_indices, k, n, 6)
+    for n in range(4, 9):
+     k = 2
+     sigma = Permutation(1, 2)
+     # print(num_patterns(sigma, k, n))
+     col_indices = tuples_w_relative_order(list(range(1, k+1)), k, n)
+     row_indices = tuples_w_relative_order(sigma, k, n)
+     # print(col_indices)
+     # print(row_indices)
+     # print(compatible([1, 5, 4], [2, 4, 3], [1, 2, 5], [2, 4, 5]))
+     all_sets = find_all_sets_patterns(sigma, col_indices, row_indices, k, n, 2)
+     count = 0
+     for path in all_sets:
+         if len(path) == 2:
+             # print(col_indices[path.data[0][1]], " -> ", row_indices[path.data[0][0]], ", ", col_indices[path.data[1][1]], " -> ", row_indices[path.data[1][0]])
+             # if col_indices[path.data[0][1]][0] != col_indices[path.data[1][1]][0] and col_indices[path.data[0][1]][1] != col_indices[path.data[1][1]][1] and  col_indices[path.data[0][1]][1] != col_indices[path.data[1][1]][0] and col_indices[path.data[0][1]][0] != col_indices[path.data[1][1]][1]:
+             #     count += 1
+             #     print(col_indices[path.data[0][1]], " -> ", row_indices[path.data[0][0]], ", ", col_indices[path.data[1][1]], " -> ", row_indices[path.data[1][0]])
+              if col_indices[path.data[0][1]][0] == col_indices[path.data[1][1]][0] or col_indices[path.data[0][1]][1] == col_indices[path.data[1][1]][1] or col_indices[path.data[0][1]][1] == col_indices[path.data[1][1]][0] or  col_indices[path.data[0][1]][0] == col_indices[path.data[1][1]][1]:
+                 count += 1
+                 # print(col_indices[path.data[0][1]], " -> ", row_indices[path.data[0][0]], ", ", col_indices[path.data[1][1]], " -> ", row_indices[path.data[1][0]])
+     print(count)
     # print(len(all_sets))
     # for path in all_sets:
     #     if len(path) == 2:
