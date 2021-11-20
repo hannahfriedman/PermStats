@@ -71,7 +71,6 @@ def T_w_ij(n: int) -> np.matrix:
     The columns are indexed by elements of Sn
     '''
     result = np.zeros((n**2, math.factorial(n)))
-
     # we will use these pairs to create our wij functions
     listOfPairs = []
     for i in range(1, n+1):
@@ -83,7 +82,7 @@ def T_w_ij(n: int) -> np.matrix:
     for sigma in Permutation.group(n):
         # Loop over rows
         for row in range(n**2):
-            result[row, col] = w_ij(listOfPairs[col][0], listOfPairs[col][1])(sigma, n)
+            result[row, col] = w_ij(listOfPairs[row][0], listOfPairs[row][1])(sigma, n)
         col += 1
 
     return result
@@ -92,7 +91,7 @@ def TstarT_w_ij(n: int) -> np.matrix:
     '''
     Returns the matrix T*T. Since T is a real matrix, T* is just T transpose.
     '''
-    T = Tmatrix_w_ij(n)
+    T = T_w_ij(n)
     return T.transpose() @ T
 
 def w_ij_vector(i: int, j: int, n: int) -> np.matrix:
@@ -235,6 +234,13 @@ def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
         pi = tau * sigma
         mat[sn_dict[pi], sn_dict[tau]] = 1
     return mat
+
+###
+n = 4
+print(TstarT_w_ij(n))
+###
+
+
 
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------

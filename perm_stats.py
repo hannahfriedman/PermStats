@@ -39,8 +39,6 @@ def count_occurrences(sigma: Permutation, tau: Permutation, n: int, k: int) -> i
     """
     return
 
-
-
 def w_ij(i: int, j: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij function
