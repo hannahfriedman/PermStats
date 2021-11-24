@@ -1,4 +1,5 @@
 from decompress import TstarT_w_ij
+from decompress import TstarT_w_ij_kl
 from permutation import Permutation
 from graphviz import Graph
 from itertools import permutations
@@ -35,17 +36,28 @@ def gen_s_nk(n, k):
         sort = sorted(p)
         mapping = {sort[i]: p[i] for i in range(len(p))}
         real.append([mapping[i] if i in p else i for i in range(1, n+1)])
-    return set([Permutation(*p) for p in real])
+    return [Permutation(*p) for p in real]
 
+def gen_rn(n):
+    result = []
+    for i in range(1, n):
+        result += [Permutation.cycle(i, n) * sigma * Permutation.cycle(i, n) for sigma in Permutation.group(n-1)]
+    result += [sigma for sigma in Permutation.group(n-1)]
+    return result
+            
 
-n = 4
-mat = np.zeros((math.factorial(n), math.factorial(n)))
-for i in range(1, n):
-    print(gen_s_nk(n,i))
-    for sigma in gen_s_nk(n, i):
-        mat += rho_reg(sigma,n)
+n = 5
+mat = sum([rho_reg(sigma, n) for sigma in gen_rn(n)])
+# mat = np.zeros((math.factorial(n), math.factorial(n)))
+# for i in range(1, n):
+#     print(gen_s_nk(n,i))
+#     for sigma in gen_s_nk(n, i):
+#         mat += rho_reg(sigma,n)
+# for sigma in gen_s_nk(n, n-1):
+#     mat += rho_reg(sigma, n)
 print(mat)
-print(mat == TstarT_w_ij(n))
+print(TstarT_w_ij(n))
+print(np.array_equal(mat, TstarT_w_ij(n)))
 
 #gen_graph(4)
 
