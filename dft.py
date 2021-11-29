@@ -12,7 +12,6 @@ import perm_stats
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
-
 def dft(f: Callable[[Permutation, int], int], n: int) -> list:
     """
     Returns the DFT of Sn with f(sigma) as the coefficient of sigma for all sigma in Sn
@@ -38,7 +37,7 @@ def matrix_rep(n: int) -> dict:
     returns a dict every permutation in Sn to it's orthogonal matrix representation
     """
     # Create dictionary representation the DFT for the generates of Sn (adjacent transpositions)
-    rho_gen =(n)
+    rho_gen = matrix_rep_gen(n)
     rho = {}
     # Creates a list of lists of permutation in Sn factored into adjacent transpositions
     sn = factor_sn(n)
