@@ -6,6 +6,8 @@ from perm_stats import length
 from perm_stats import major_index
 from perm_stats import w_ij
 
+np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
+
 D8 = [Permutation(), Permutation(2,3,4,1), Permutation(3,4,1,2), Permutation(4,1,2,3), Permutation(2,1,4,3), Permutation(3,2,1,4), Permutation(4,3,2,1), Permutation(1,4,3,2)]
 
 
@@ -60,8 +62,14 @@ class Representation(object):
             return self
         else:
             return self * self**(n-1)
-    def __repr__(self):
-        return str(self.data)
+    def __str__(self):
+        s = ''
+        for m in self:
+            s += str(m)
+            s += '\n'
+        return s
+    def __iter__(self):
+        return iter(self.data)
     def scale(self, n: int):
         new = [np.array(n*i) for i in self.data]
         return Representation(new)
@@ -77,11 +85,18 @@ r = Representation([np.array([[1]]), np.array([[1]]), np.array([[w, 0],[0, w**(-
 s = Representation([np.array([[1]]), np.array([[-1]]), np.array([[0,1],[1,0]]), np.array([[0,1],[1,0]])])
 D10 = [r**i for i in [5, 1, 2, 3, 4]] + [s*r**i for i in range(1, 6)]
 
-for dist in distributions(excedances, 5):
-    weighted = [D8[i].scale(dist[i]) for i in range(len(D8))]
+
+
+n = 5
+for dist in distributions(excedances, n):
+    if n == 4:
+        weighted = [D8[i].scale(dist[i]) for i in range(len(D8))]
+    elif n == 5:
+        weighted = [D10[i].scale(dist[i]) for i in range(len(D10))]
     DFT = weighted[0]
     for i in range(1, len(weighted)):
         DFT += weighted[i]
-    print(DFT)
+    DFT = [np.round_(a, 3) for a in DFT]
+    print(Representation(DFT))
 
 
