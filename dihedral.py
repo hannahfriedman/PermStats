@@ -40,8 +40,9 @@ def distributions(f, n: int) -> list:
 
 
 
-#########################
+############################
 ## DFT for dihedral group ##
+############################
 
 class Representation(object):
     def __init__(self, data: list):
@@ -57,7 +58,6 @@ class Representation(object):
             l.append(self.data[i] + other.data[i])
         return Representation(l)
     def __pow__(self, n: int):
-#        print(self)
         if n == 1:
             return self
         else:
@@ -78,25 +78,37 @@ class Representation(object):
 r = Representation([np.array([[1]]), np.array([[1]]), np.array([[-1]]), np.array([[-1]]), np.array([[0, 1], [-1, 0]])])
 s = Representation([np.array([[1]]), np.array([[-1]]), np.array([[1]]), np.array([[-1]]), np.array([[1, 0], [0, -1]])])
 D8 = [r**4, r, r**2, r**3, s, s*r, s*r**2, s*r**3]
-
 #D10
 w = cmath.e**(2*cmath.pi*complex(0, 1)/5)
 r = Representation([np.array([[1]]), np.array([[1]]), np.array([[w, 0],[0, w**(-1)]]), np.array([[w**2, 0],[0, w**(-2)]])])
 s = Representation([np.array([[1]]), np.array([[-1]]), np.array([[0,1],[1,0]]), np.array([[0,1],[1,0]])])
 D10 = [r**i for i in [5, 1, 2, 3, 4]] + [s*r**i for i in range(1, 6)]
 
+#D2n
+def dihedral(n: int) -> list:
+    w = cmath.e**(2*cmath.pi*complex(0, 1)/n)
+    onedr = [np.array([[1]]), np.array([[1]])]
+    oneds = [np.array([[1]]), np.array([[-1]])]
+    num_2d_reps = int((n-1)/2)
+    if n%2 == 0:
+        onedr += [np.array([[-1]]), np.array([[-1]])]
+        oneds += [np.array([[1]]), np.array([[-1]])]
+        num_2d_reps = int((n-2)/2)
+    r = Representation(onedr + [np.array([[w**k, 0],[0, w**(-k)]]) for k in range(1, num_2d_reps + 1)])
+    s = Representation(oneds + num_2d_reps*[np.array([[0,1],[1,0]])])
+    D2n = [r**n] + [r**i for i in range(1, n)] + [s] + [s*r**i for i in range(1, n)]
+    return D2n
 
 
-n = 5
+n = 6
 for dist in distributions(excedances, n):
-    if n == 4:
-        weighted = [D8[i].scale(dist[i]) for i in range(len(D8))]
-    elif n == 5:
-        weighted = [D10[i].scale(dist[i]) for i in range(len(D10))]
+    D2n = dihedral(n)
+    weighted = [D2n[i].scale(dist[i]) for i in range(len(D2n))]
     DFT = weighted[0]
     for i in range(1, len(weighted)):
         DFT += weighted[i]
     DFT = [np.round_(a, 3) for a in DFT]
+    print(dist)
     print(Representation(DFT))
 
 
