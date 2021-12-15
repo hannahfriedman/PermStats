@@ -65,3 +65,8 @@ def total(f: Callable[[Permutation, int], int], n: int) -> int:
     for sigma in sn:
         count += f(sigma, n)
     return count
+
+def normal(f: Callable[[Permutation, int], int], n: int) -> Callable:
+    def func(sigma, n):
+        return f(sigma, n)/total(f, n)
+    return func

@@ -2,10 +2,10 @@ from permutation import Permutation
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Callable
-
 import numpy as np
 import perm_stats
 import misc
+from dft import dft
 
 ###------------------------------------------------------------------------------------
 #Generate w_ij, w_ij_kl matrices for Sn
@@ -192,6 +192,49 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
     """
     mat1 = rep_w_ij(i, j, n)/2 + rep_w_ij(k,l, n)/2
     plot_var_dist(mat1, max_pow)
+
+###------------------------------------------------------------------------------------
+
+def upper_bound(reps: list) -> float:
+    result = 0
+    for rep in reps:
+        d = rep.shape[0]
+        mat = rep @ np.transpose(rep)
+        result += d * np.trace(mat)
+    return result/4
+
+def random_walk(f, k: int, n: int) -> list:
+    result = []
+    original_reps = dft(perm_stats.normal(f, n),n)[1:]
+    print(original_reps)
+    exp_reps = original_reps
+    for i in range(1, k+1):
+        result.append(upper_bound(exp_reps))
+        exp_reps = [exp_reps[i] * original_reps[i] for i in range(len(exp_reps))]
+    return result    
+
+def slow_random_walk(f, t: int, k: int, n: int) -> list:
+    result = []
+    additional = dft(perm_stats.normal(perm_stats.w_ij(1,1), n), n)[1:]
+    starting_reps = dft(perm_stats.normal(f, n),n)[1:]
+    original_reps = [t*starting_reps[i] + (1-t)*additional[i] for i in range(len(starting_reps))]
+    exp_reps = original_reps
+    for i in range(1, k+1):
+        result.append(upper_bound(exp_reps))
+        exp_reps = [exp_reps[i] * original_reps[i] for i in range(len(exp_reps))]
+    return result    
+
+n = 5
+k = 20
+# for t1 in range(1, 81):
+#     upper_bounds1 = slow_random_walk(perm_stats.excedances, 1/t1, k, n)
+#     plt.scatter(range(1, k+1), upper_bounds1)
+upper_bounds2 = random_walk(perm_stats.w_ij(1,1), k, n)
+plt.scatter(range(1, k+1), upper_bounds2)
+plt.yscale("linear")
+plt.show()
+
+
     
 ###------------------------------------------------------------------------------------
 
@@ -200,13 +243,13 @@ def pvd_w_ij_kl(i: int, j: int, k: int, l: int, max_pow: int, n: int) -> None:
 #     pvd(5, "length", 80, 1/i)
 # plt.show()
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # m = rep("exced", 3, False)
     # print(m)
     # ax = sns.heatmap(m, linewidth=0.5)
     # plt.show()
-    count = 0
-    for sigma in Permutation.group(4):
-        if perm_stats.excedances(sigma, 4) == 2:
-            count += 1
-    print(count)
+    # count = 0
+    # for sigma in Permutation.group(4):
+    #     if perm_stats.excedances(sigma, 4) == 2:
+    #         count += 1
+    # print(count)

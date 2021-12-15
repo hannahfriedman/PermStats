@@ -101,7 +101,7 @@ def dihedral(n: int) -> list:
 
 
 n = 6
-for dist in distributions(excedances, n):
+for dist in distributions(w_ij(3,5), n):
     D2n = dihedral(n)
     weighted = [D2n[i].scale(dist[i]) for i in range(len(D2n))]
     DFT = weighted[0]
