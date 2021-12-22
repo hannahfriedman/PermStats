@@ -235,12 +235,6 @@ def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
         mat[sn_dict[pi], sn_dict[tau]] = 1
     return mat
 
-###
-n = 4
-print(TstarT_w_ij(n))
-###
-
-
 
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------

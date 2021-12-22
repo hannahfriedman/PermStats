@@ -72,33 +72,3 @@ print(np.array_equal(mat, TstarT_w_ij(n)))
 # print(np.round_(eig(TstarT_w_ij(n))[1], decimals=1))
 # print(TstarT_w_ij(n) @ np.array([[1], [1], [1], [1], [1], [1]]))
 
-### OLD ###
-# mat = np.zeros((math.factorial(n), math.factorial(n)))
-# for i in range(1, n):
-#     print(gen_s_nk(n,i))
-#     for sigma in gen_s_nk(n, i):
-#         mat += rho_reg(sigma,n)
-# for sigma in gen_s_nk(n, n-1):
-#     mat += rho_reg(sigma, n)
-
-#gen_graph(4)
-
-
-# n = 5
-# sn = [sigma for sigma in Permutation.group(n)]
-# mat = TstarT_w_ij(n)
-# entries = []
-# #for sigma in [Permutation(2,3,1), Permutation(3,1,2)]:
-# #for sigma in [Permutation(2,1), Permutation(1,3,2), Permutation(3,2,1)]:
-# for i in range(len(sn)):
-#     for j in range(i, len(sn)):
-#         zero = True
-#         for sigma in Permutation.group(n-2):
-#             if sn[i] == sigma *  sn[j]:
-#                 zero = False
-#                 break
-#         if zero:
-#             entries.append(mat[i,j])
-#         #if sn[i] == sigma *  sn[j]:
-#             #entries.append(mat[i, j])
-# print(entries)

@@ -31,6 +31,9 @@ def length(sigma: Permutation, n: int) -> int:
     return sigma.inversions()
 
 def fixed_points(sigma: Permutation, n: int) -> int:
+    '''
+    Returns the number of fixed points in a permutation
+    '''
     count = 0
     for i in range(1, n+1):
         if sigma(i) == i:
@@ -74,6 +77,9 @@ def total(f: Callable[[Permutation, int], int], n: int) -> int:
     return count
 
 def normal(f: Callable[[Permutation, int], int], n: int) -> Callable:
-    def func(sigma, n):
-        return f(sigma, n)/total(f, n)
-    return func
+    """
+    f: permutation statistic
+    Returns a function that, when called on a permutation returns f of that permutation divided by the sum of f over Sn
+    """
+    return (lambda sigma, n: f(sigma)/total(f, n))
+    

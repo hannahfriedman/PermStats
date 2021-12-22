@@ -3,6 +3,9 @@ import math
 import numpy as np
 
 def wolfram_syntax(mat: np.array) -> None:
+    '''
+    Returns a numpy arrray  as a string in wolfram alpha syntax
+    '''
     string = "{"
     for row in range(len(mat)):
         string+="{"
@@ -18,6 +21,9 @@ def wolfram_syntax(mat: np.array) -> None:
     print(string)
 
 def matlab_syntax(mat: np.array) -> None:
+    '''
+    Returns a numpy  array  as a string in matlab syntax
+    '''
     string = "["
     for row in range(len(mat)):
         for col in range(len(mat)):
@@ -69,6 +75,9 @@ def falling_factorial(n: int, k:int) -> int:
     return product
 
 def choose(n: int, k: int) -> int:
+    """
+    Returns n choose k
+    """
     if k > n:
         return 0
     return falling_factorial(n, k)//math.factorial(n - k)
