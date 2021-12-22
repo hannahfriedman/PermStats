@@ -1,5 +1,6 @@
 from permutation import Permutation
 import matplotlib.pyplot as plt
+import math
 import seaborn as sns
 from typing import Callable
 import numpy as np
@@ -92,12 +93,29 @@ def rep(function: str, n: int, normalize=True) -> np.array:
     '''
     User friendly version of representation function
     '''
+    w_mat = w_ij_kl_mat
+    dim = misc.falling_factorial(n, n-2)
     if function == "exced":
-        return representation(perm_stats.excedances, w_ij_mat, n, n, normalize)
-    if function == "major index":
-        return representation(perm_stats.major_index, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
-    if function == "length":
-        return representation(perm_stats.length, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
+        f = perm_stats.excedances
+        w_mat = w_ij_mat
+        dim = n
+        #return representation(perm_stats.excedances, w_ij_mat, n, n, normalize)
+    elif function == "fixed":
+        f = perm_stats.fixed_points
+        w_mat = w_ij_mat
+        dim = n
+    elif function == "major index":
+        f = perm_stats.major_index
+        #return representation(perm_stats.major_index, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
+    elif function == "length":
+        f = perm_stats.length
+        #return representation(perm_stats.length, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
+    else:
+        raise("Function not supported.")
+    if normalize:
+        f = perm_stats.normal(f, n)
+    return representation(f, w_mat, dim, n, False)
+        
 
 def rep_tau(tau: float, function: Callable[[Permutation, int], int], n: int) -> np.array:
     """
@@ -122,13 +140,13 @@ def rep_w_ij(i: int, j: int, n: int) -> np.array:
     """
     Generates matrix representation of w_ij matrices for convolving
     """
-    return representation(perm_stats.w_ij(i,j), w_ij_mat, n, n)
+    return representation(perm_stats.w_ij(i,j), w_ij_mat, n, n, False)
 
 def rep_w_ij_kl(i: int, j: int, k: int, l: int, n: int) -> np.array:
     """
     Generates matrix representation of w_ij_kl matrices for convolving
     """
-    return representation(perm_stats.w_ij_kl(i,j,k,l), w_ij_kl_mat, misc.falling_factorial(n, n-2), n)
+    return representation(perm_stats.w_ij_kl(i,j,k,l), w_ij_kl_mat, misc.falling_factorial(n, n-2), n, False)
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 # Variation distance and Exponentiating for Random Walks
@@ -201,19 +219,20 @@ def upper_bound(reps: list) -> float:
         d = rep.shape[0]
         mat = rep @ np.transpose(rep)
         result += d * np.trace(mat)
-    return result/4
+    return math.sqrt(result/4)
 
 def random_walk(f, k: int, n: int) -> list:
     result = []
     original_reps = dft(perm_stats.normal(f, n),n)[1:]
-    print(original_reps)
+#    print(original_reps)
     exp_reps = original_reps
     for i in range(1, k+1):
         result.append(upper_bound(exp_reps))
-        exp_reps = [exp_reps[i] * original_reps[i] for i in range(len(exp_reps))]
+#        print(exp_reps)
+        exp_reps = [exp_reps[i] @ original_reps[i] for i in range(len(exp_reps))]
     return result    
 
-def slow_random_walk(f, t: int, k: int, n: int) -> list:
+def slow_random_walk(f, t: float, k: int, n: int) -> list:
     result = []
     additional = dft(perm_stats.normal(perm_stats.w_ij(1,1), n), n)[1:]
     starting_reps = dft(perm_stats.normal(f, n),n)[1:]
@@ -221,21 +240,66 @@ def slow_random_walk(f, t: int, k: int, n: int) -> list:
     exp_reps = original_reps
     for i in range(1, k+1):
         result.append(upper_bound(exp_reps))
-        exp_reps = [exp_reps[i] * original_reps[i] for i in range(len(exp_reps))]
+        exp_reps = [exp_reps[i] @ original_reps[i] for i in range(len(exp_reps))]
     return result    
 
-n = 5
-k = 20
-# for t1 in range(1, 81):
-#     upper_bounds1 = slow_random_walk(perm_stats.excedances, 1/t1, k, n)
-#     plt.scatter(range(1, k+1), upper_bounds1)
-upper_bounds2 = random_walk(perm_stats.w_ij(1,1), k, n)
-plt.scatter(range(1, k+1), upper_bounds2)
-plt.yscale("linear")
-plt.show()
 
+#-----------------------------------------------------------------
 
-    
+def wij_rep(i: int, j: int, n: int) -> np.array:
+    i = i-1
+    j = j-1
+    mat = np.zeros((n,n))
+    mat[i, j] = math.factorial(n-1)
+    for row in range(mat.shape[0]):
+        if row != i:
+            for col in range(mat.shape[1]):
+                if col != j:
+                    mat[row, col] = math.factorial(n-2)
+    return mat
+n = 3
+mat = sum([wij_rep(i, i, n) for i in range(1, n+1)])/math.factorial(n)
+
+#print(mat)
+
+# n = 5
+# k = 20
+# y = random_walk(perm_stats.excedances, k, n)
+# x = [i for i in range(1, k+1)]
+# plt.yscale("linear")
+# plt.scatter(x,y)
+# plt.title("Exceedences")
+# plt.ylabel("Variation Distance")
+# plt.xlabel("Number of Steps")
+# plt.show()
+
+ 
+# k = 20
+# n = 5
+# for t1 in range(1, 20):
+#     y = slow_random_walk(perm_stats.length, t1*0.05, k, n)
+# #    print(n, np.round_(y, 2))
+#     x = [i for i in range(1, k+1)]
+#     plt.yscale("linear")
+#     plt.scatter(x,y)
+#     plt.title("Length")
+#     plt.ylabel("Variation Distance")
+#     plt.xlabel("Number of Steps")
+# plt.show()
+
+# n = 5
+# #print(rep("fixed", n, normalize=False))
+# mat = rep_w_ij_kl(1, 2, 1, 2, n)
+# for i in range(1, n+1):
+#     for j in range(i+1, n+1):
+#         if not(i == 1 and j == 2):
+# #            print(rep_w_ij_kl(i, j, i, j ,n))
+#             mat += rep_w_ij_kl(i, j, i, j ,n)
+# print(2*mat)
+# print(np.round_(np.linalg.eig(2*mat)[0]))
+#print(sum([rep_w_ij(i, i, n) for i in range(1, n+1)])
+# print(rep_w_ij(1,2,n))
+# print(rep("exced", n, normalize=False))
 ###------------------------------------------------------------------------------------
 
 # Plot excedance random walk with various tau

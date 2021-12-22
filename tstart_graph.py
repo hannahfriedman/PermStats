@@ -30,7 +30,8 @@ def rho_reg(sigma, n) -> np.array:
         for col in range(len(sn)):
             if sn[row] == sigma*sn[col]:
                 result[row, col] = 1
-    return result
+                break
+    return np.transpose(result)
 
 def gen_s_nk(n, k):
     perms = permutations(range(1, n+1), k)
@@ -52,10 +53,10 @@ def gen_rn(n):
 n = 3
 #mat = sum([rho_reg(sigma, n) for sigma in gen_rn(n)])
 ### WIJ VERSION ###
-# mat = sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij(1,1)(sigma, n) == 1])
-# for i in range(2, n+1):
-#     j = i
-#     mat += sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij(i, j)(sigma, n) == 1])
+mat = sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij(1,1)(sigma, n) == 1])
+for i in range(2, n+1):
+    j = i
+    mat += sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij(i, j)(sigma, n) == 1])
 
 ### WIJKL VERSION ###
 # mat = sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij_kl(1,2,1,2)(sigma, n) == 1])
@@ -64,12 +65,12 @@ n = 3
 #         if j != 2:
 #             mat += sum([rho_reg(sigma, n) for sigma in Permutation.group(n) if w_ij_kl(i, j, i, j)(sigma, n) == 1])
 
-# print(mat)
-# print(TstarT_w_ij_kl(n))
-# print(np.array_equal(2*mat, TstarT_w_ij_kl(n)))
-print(np.round_(eig(TstarT_w_ij(n))[0], decimals=1))
-print(np.round_(eig(TstarT_w_ij(n))[1], decimals=1))
-print(TstarT_w_ij(n) @ np.array([[1], [1], [1], [1], [1], [1]]))
+print(mat)
+print(TstarT_w_ij(n))
+print(np.array_equal(mat, TstarT_w_ij(n)))
+# print(np.round_(eig(TstarT_w_ij(n))[0], decimals=1))
+# print(np.round_(eig(TstarT_w_ij(n))[1], decimals=1))
+# print(TstarT_w_ij(n) @ np.array([[1], [1], [1], [1], [1], [1]]))
 
 ### OLD ###
 # mat = np.zeros((math.factorial(n), math.factorial(n)))

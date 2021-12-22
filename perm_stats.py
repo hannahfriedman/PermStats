@@ -30,6 +30,13 @@ def length(sigma: Permutation, n: int) -> int:
     """
     return sigma.inversions()
 
+def fixed_points(sigma: Permutation, n: int) -> int:
+    count = 0
+    for i in range(1, n+1):
+        if sigma(i) == i:
+            count += 1
+    return count
+
 def count_occurrences(sigma: Permutation, tau: Permutation, n: int, k: int) -> int:
     """
     Arguments: sigma, a permutation in Sn
