@@ -1,3 +1,5 @@
+## Find eigenvalues of block representations ##
+
 from dft import dft 
 from perm_stats import w_ij
 from perm_stats import w_ij_kl

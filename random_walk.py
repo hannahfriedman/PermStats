@@ -1,3 +1,5 @@
+## This file needs clean up ##
+
 from permutation import Permutation
 import matplotlib.pyplot as plt
 import math
@@ -56,6 +58,17 @@ def w_mat_sn(w: Callable[[Permutation, int], np.array], n: int) -> dict:
     for sigma in sn:
         mats[sigma] = w(sigma, n)
     return mats
+
+def rho_reg(sigma, n) -> np.array:
+    result = np.zeros((math.factorial(n), math.factorial(n)))
+    sn = [perm for perm in Permutation.group(n)]
+    for row in range(len(sn)):
+        for col in range(len(sn)):
+            if sn[row] == sigma*sn[col]:
+                result[row, col] = 1
+                break
+    return np.transpose(result)
+
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 # Generate matrix representations of functions on Sn
