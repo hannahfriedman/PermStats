@@ -97,3 +97,12 @@ def eig_multiplicity(m: np.matrix) -> dict:
         else:
             dictOfEigs[roundedEig] += 1
     return dictOfEigs
+
+def nullspace(m: np.matrix) -> list:
+    spanning_set = []
+    U, S, Vt = np.linalg.svd(m)
+    for i in range(len(S)):
+        if np.linalg.norm(S[i]) <= 10**-10:
+            spanning_set.append(Vt[i]/Vt[i, 0])
+    return spanning_set
+

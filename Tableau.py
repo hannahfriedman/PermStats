@@ -3,6 +3,7 @@ import math
 import copy
 from numpy.linalg import matrix_power
 from typing import Type
+from permutation import Permutation
 
 class Tableau(object):
     def __init__(self, data: list) -> None:
@@ -99,6 +100,58 @@ class Tableau(object):
         switched_tableau.data[k_plus_one_row][k_plus_one_col] = k
         return switched_tableau
 
+    def dist_from_standard(self):
+        ''' 
+        Computes the distance of tableau from being standard, i.e. the inversions in a tableau
+        '''
+        dist = 0
+        for row in range(len(self.data)):
+            for col in range(len(self.data[row])):
+                # Find inversions at self.data[row][col]
+                for i in range(col + 1, len(self.data[row])):
+                    if self.data[row][col] > self.data[row][i]:
+                        dist += 1
+                if row < len(self.data) - 1:# and len(self.data[row + 1]) > col:
+                    for j in range(row+1, len(self.data)):
+                        if len(self.data[j]) <= col:
+                            break
+                        elif  self.data[row][col] > self.data[j][col]:
+                            dist += 1
+        return dist
+
+    def apply_permutation(self, sigma):
+        data = []
+        for row in self.data:
+            data.append([sigma(i) for i in row])
+        return Tableau(data)
+
+    def permutation_difference(self, other):
+        permutation  = self.size * [0]
+        for row in range(len(self.data)):
+            for col in range(len(self.data[row])):
+                permutation[self.data[row][col] - 1] = other.data[row][col]
+        return Permutation(*permutation)
+                
+
+    @staticmethod
+    def perm_to_tableau(sigma, partition: tuple) -> "Tableau":
+        data = []
+        prev = 0
+        for part in partition:
+            row = []
+            for entry in range(part):
+                row.append(sigma(1 + prev + entry))
+            data.append(row)
+            prev += part
+        return Tableau(data)
+
+    @staticmethod
+    def generate_all_lambda(lamb: tuple, n: int) -> list:
+        '''
+        Generates all tableuax (including non standard) of shape lambda
+        '''
+        return [perm_to_tableau(sigma) for sigma in Permutation.group(n)]
+
     @staticmethod
     def generate_all(n: int) -> list:
         '''
@@ -146,3 +199,5 @@ class Tableau(object):
                     tableaux[i], tableaux[i+1] = tableaux[i+1], tableaux[i]
                     switched = True
         return
+
+    

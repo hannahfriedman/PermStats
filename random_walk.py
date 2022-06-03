@@ -1,5 +1,3 @@
-## This file needs clean up ##
-
 from permutation import Permutation
 import matplotlib.pyplot as plt
 import math
@@ -9,6 +7,8 @@ import numpy as np
 import perm_stats
 import misc
 from dft import dft
+
+## This file needs clean up ##
 
 ###------------------------------------------------------------------------------------
 #Generate w_ij, w_ij_kl matrices for Sn
@@ -122,13 +122,14 @@ def rep(function: str, n: int, normalize=True) -> np.array:
         #return representation(perm_stats.major_index, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
     elif function == "length":
         f = perm_stats.length
+    elif function == "descent":
+        f = perm_stats.descent
         #return representation(perm_stats.length, w_ij_kl_mat, misc.falling_factorial(n, n-2), n, normalize)
     else:
         raise("Function not supported.")
     if normalize:
         f = perm_stats.normal(f, n)
     return representation(f, w_mat, dim, n, False)
-        
 
 def rep_tau(tau: float, function: Callable[[Permutation, int], int], n: int) -> np.array:
     """
@@ -160,6 +161,34 @@ def rep_w_ij_kl(i: int, j: int, k: int, l: int, n: int) -> np.array:
     Generates matrix representation of w_ij_kl matrices for convolving
     """
     return representation(perm_stats.w_ij_kl(i,j,k,l), w_ij_kl_mat, misc.falling_factorial(n, n-2), n, False)
+
+# for i in range(4, 7):
+#     print(rep_w_ij_kl(2, 3, 4, 1, i))
+
+# for i in range(6, 7):
+#     print(np.round(np.real(np.linalg.eig(rep('length', i, False))[0]),3))
+    # print(rep('length', i, False))
+
+# print(np.linalg.eig(rep('exced', 5, False))[0])
+# print(np.round(np.real(np.linalg.eig(rep('descent', 5, False))[0])))
+# print(np.round(np.real(np.linalg.eig(rep('length', 5, False))[0])))
+# print(np.round(np.real(np.linalg.eig(rep('major index', 5, False))[0])))
+
+# m = rep('fixed', 5, True)
+# factor = rep('fixed', 5, True)
+# for _ in range(50):
+#     m = m @ factor
+# v = np.random.rand(5, 1)
+# print(v)
+# print(m@v)
+# print(m)
+
+# M = np.zeros((5, 5))
+# for i in range(1, 6):
+#     for j in range(1, 6):
+#         M += rep_w_ij(i, j, 5)
+# print(M)
+    
 ###------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------
 # Variation distance and Exponentiating for Random Walks
@@ -270,8 +299,9 @@ def wij_rep(i: int, j: int, n: int) -> np.array:
                 if col != j:
                     mat[row, col] = math.factorial(n-2)
     return mat
-n = 3
-mat = sum([wij_rep(i, i, n) for i in range(1, n+1)])/math.factorial(n)
+
+# n = 3
+# mat = sum([wij_rep(i, i, n) for i in range(1, n+1)])/math.factorial(n)
 
 #print(mat)
 
