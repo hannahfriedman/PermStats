@@ -1,6 +1,8 @@
 from permutation import Permutation
+from itertools import combinations 
 from tableau import Tableau
 from typing import Callable
+from misc import perm_pow
 import math
 
 def excedances(sigma: Permutation, n: int) -> int:
@@ -54,6 +56,9 @@ def fixed_points(sigma: Permutation, n: int) -> int:
             count += 1
     return count
 
+def power_function(function, k):
+    return (lambda sigma, n: function(perm_pow(sigma, k), n))
+
 def cycle_indicator(sigma: Permutation, n: int) -> int:
     generator = Permutation(*([i for i in range(2, n+1)] + [1]))
     current = generator
@@ -79,6 +84,15 @@ def count_occurrences(sigma: Permutation, tau: Permutation, n: int, k: int) -> i
     """
     return
 
+def inc_seq_k(sigma, k, n):
+    one_n = list(range(1,n+1))
+    count = 0
+    for indices in combinations(one_n, k):
+        for images in combinations(one_n, k):
+            if w_gen(images, indices, sigma):
+                count += 1
+    return count
+
 def w_ij(i: int, j: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij function
@@ -87,6 +101,13 @@ def w_ij(i: int, j: int) -> Callable[[Permutation, int], int]:
     """
     return (lambda sigma, n: int(sigma(j) == i))
 
+def generate_w_ij(n: int) -> list:
+    result = []
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            result.append(w_ij(i, j))
+    return result
+
 def w_ij_kl(i: int, j: int, k: int, l: int) -> Callable[[Permutation, int], int]:
     """
     returns a w_ij_kl function
@@ -94,6 +115,12 @@ def w_ij_kl(i: int, j: int, k: int, l: int) -> Callable[[Permutation, int], int]
     and returns 1 if sigma maps k to i and l to j, and 0 otherwise
     """
     return (lambda sigma, n: int(sigma(k) == i and sigma(l) == j))
+
+def w_gen(pattern: list, indices: list, sigma):
+    for i in range(len(indices)):
+        if sigma(indices[i]) != pattern[i]:
+            return False
+    return True
 
 def total(f: Callable[[Permutation, int], int], n: int) -> int:
     """

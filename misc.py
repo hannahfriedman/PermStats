@@ -1,6 +1,7 @@
 from permutation import Permutation
 import math
 import numpy as np
+from sympy import Matrix
 
 def wolfram_syntax(mat: np.array) -> None:
     '''
@@ -98,6 +99,15 @@ def eig_multiplicity(m: np.matrix) -> dict:
             dictOfEigs[roundedEig] += 1
     return dictOfEigs
 
+def perm_pow(sigma, k):
+    if k == 0:
+        return Permutation()
+    elif k%2 == 1:
+        return sigma * perm_pow(sigma, k - 1)
+    else:
+        half = perm_pow(sigma, k//2)
+        return half *  half
+
 def nullspace(m: np.matrix) -> list:
     spanning_set = []
     U, S, Vt = np.linalg.svd(m)
@@ -106,3 +116,72 @@ def nullspace(m: np.matrix) -> list:
             spanning_set.append(Vt[i]/Vt[i, 0])
     return spanning_set
 
+def function_to_vector(function, n):
+    result = []
+    for g in Permutation.group(n):
+        result.append(function(g, n))
+    return result
+
+def vector_to_function(vector, n):
+    d = {}
+    index = 0
+    for g in Permutation.group(n):
+        d[g] = vector[index]
+        index += 1
+    return (lambda sigma, n: d[sigma])
+
+def left_action_on_vector(vector, current_basis, sigma):
+    return [vector[current_basis.index(sigma * permutation)] for permutation in current_basis]
+
+def left_right_action_on_vector(vector, current_basis, sigma, tau):
+    return [vector[current_basis.index(sigma * permutation * tau)] for permutation in current_basis]
+
+def add_functions(f1, f2, n):
+    v1 = function_to_vector(f1, n)
+    v2 = function_to_vector(f2, n)
+    v = np.array(v1) + np.array(v2)
+    return vector_to_function(v, n)
+
+def add_weighted_functions(f1, f2, w1, w2, n):
+    v1 = function_to_vector(f1, n)
+    v2 = function_to_vector(f2, n)
+    v = w1 * np.array(v1) + w2* np.array(v2)
+    return vector_to_function(v, n)
+
+def distribution(v):
+    result = []
+    for i in v:
+        while i >= len(result):
+            result.append(0)
+        result[i] += 1
+    return result
+
+def similar(m1, m2):
+    ''' Return P such that m2 = Pm1P^(-1) or false if m1, m2 are not similar'''
+    m1 = Matrix(m1)
+    m2 = Matrix(m2)
+    p1, j1 = m1.jordan_form()
+    p2, j2 = m2.jordan_form()
+    p1 = np.array(p1).astype(np.float64)
+    j1 = np.array(j1).astype(np.float64)
+    p2 = np.array(p2).astype(np.float64)
+    j2 = np.array(j2).astype(np.float64)
+    if not (j1 == j2).all():
+        return False
+    return p2 @ np.linalg.inv(p1)
+
+def function_sum_to_vector(n, *args):
+    result = np.zeros((1, math.factorial(n)))
+    for f in args:
+        result += np.array(function_to_vector(f, n))
+    return result
+        
+def mats_into_vec(dim, mats):
+    v = np.zeros((dim,))
+    count = 0
+    for m in mats:
+        for row in range(m.shape[0]):
+            for col in range(m.shape[1]):
+                v[count] = m[row, col]
+                count += 1
+    return v

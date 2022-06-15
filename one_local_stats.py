@@ -99,6 +99,13 @@ def make_subplots(indices, nrows, ncols, n):
         plt.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False, labeltop = False)
     plt.show()
 
+def compute_distribution(vector, n):
+    distribution = (n+1) * [0]
+    for entry in vector:
+        distribution[entry] += 1
+    return distribution
+
+    
 n = 4
 positions = generate_positions(n)
 
@@ -111,9 +118,7 @@ for index in combinations(positions, 6):
         d[v] = [index]
 big_d = {}
 for key in d.keys():
-    distribution = (n+1) * [0]
-    for entry in key:
-        distribution[entry] += 1
+    distribution = compute_distribution(key, n)
     dist = tuple(distribution)
     if dist in big_d.keys():
         big_d[dist] += d[key]

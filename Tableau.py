@@ -131,7 +131,34 @@ class Tableau(object):
             for col in range(len(self.data[row])):
                 permutation[self.data[row][col] - 1] = other.data[row][col]
         return Permutation(*permutation)
-                
+
+    def row_descent(self):
+        descents = []
+        for row in range(len(self.data)):
+            for current in range(len(self.data[row])):
+                for col in range(current, len(self.data[row])):
+                    if self.data[row][col] < self.data[row][current]:
+                        descents.append((self.data[row][current], self.data[row][col], row, current, col))
+        return descents
+
+    def col_descent(self):
+        desceents = []
+        for current in range(len(self.data)):
+            for row in range(current, len(self.data)):
+                for col in range(len(self.data[row])):
+                    if self.data[row][col] < self.data[current][col]:
+                        descents.append((self.data[current][col], self.data[row][col], col, row, current))
+        return descents
+
+    def eliminate_column_descents(self):
+        data = copy.deepcopy(self.data)
+        for current in range(len(data)):
+            for row in range(current, len(data)):
+                for col in range(len(data[row])):
+                    if data[row][col] < data[current][col]:
+                        data[current][col], data[row][col] = data[row][col], data[current][col]
+        return Tableau(data)
+                        
 
     @staticmethod
     def perm_to_tableau(sigma, partition: tuple) -> "Tableau":

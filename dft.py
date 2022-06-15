@@ -13,24 +13,107 @@ import perm_stats
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
+def one_local_dft_natural(wij_indices, n):
+    result = [np.zeros((1,1)), np.zeros((n-1, n-1))]
+    for i, j, c in wij_indices:
+        result[0] = result[0] + np.array([[math.factorial(n-1)*c]])
+        result[1] = result[1] + wij_dft_n_minus_one_one(i, j, n)
+    return result
+        
+
+def wij_dft_n_minus_one_one(i, j, n):
+    result = np.zeros((n-1, n-1))
+    if j == 1:
+        for row in range(n-1):
+            val_to_add = math.factorial(n-2)
+            if row == i - 2:
+                val_to_add = -math.factorial(n-1)
+            for col in range(n-1):
+                result[row, col] = val_to_add
+    else:
+        for row in range(n-1):
+            val_to_add = - math.factorial(n-2)
+            if row == i - 2:
+                val_to_add = math.factorial(n-1)
+            result[row, j - 2] = val_to_add
+    return result
+
+def dft_matrix(f: Callable[[Permutation, int], int], n: int):
+    ft = dft(f, n)
+    result = np.array(ft[0])
+    for mat in ft[1:]:
+        for _ in range(mat.shape[0]):
+            result = np.block([
+                [result, np.zeros((result.shape[0], mat.shape[1]))],
+                [np.zeros((mat.shape[0], result.shape[1])), mat]
+                ])
+    return result
+
+# def dft(f: Callable[[Permutation, int], int], n: int) -> list:
+#     """
+#     Returns the DFT of Sn with f(sigma) as the coefficient of sigma for all sigma in Sn
+#     """
+#     nfac = math.factorial(n)
+#     sn = Permutation.group(n)
+#     result = []
+#     rho = matrix_rep(n)         # map from Sn to Fourier space
+#     num_mats = len(rho[Permutation()])
+#     for sigma in sn:
+#         perm_stat = f(sigma, n)
+#         if sigma == Permutation():    # for the first permutation, append matrices to list
+#             for mat in rho[sigma]:
+#                 result.append(perm_stat*mat)
+#         else:                         # for the following permutations, add their representations to existing matrices
+#             for index in range(num_mats): 
+#                 result[index] = np.add(result[index], perm_stat*rho[sigma][index])
+#     return adjust_zeros(result)
+
 def dft(f: Callable[[Permutation, int], int], n: int) -> list:
     """
     Returns the DFT of Sn with f(sigma) as the coefficient of sigma for all sigma in Sn
     """
     nfac = math.factorial(n)
     sn = Permutation.group(n)
-    result = []
     rho = matrix_rep(n)         # map from Sn to Fourier space
     num_mats = len(rho[Permutation()])
+    result = [f(Permutation(), n) * mat for mat in rho[Permutation()]]
     for sigma in sn:
         perm_stat = f(sigma, n)
-        if sigma == Permutation():    # for the first permutation, append matrices to list
-            for mat in rho[sigma]:
-                result.append(perm_stat*mat)
-        else:                         # for the following permutations, add their representations to existing matrices
+        if sigma != Permutation(): # for the following permutations, add their representations to existing matrices
             for index in range(num_mats): 
                 result[index] = np.add(result[index], perm_stat*rho[sigma][index])
     return adjust_zeros(result)
+
+
+def inverse_dft(mats: list, n: int) -> list:
+    n_fac = math.factorial(n)
+    reps = matrix_rep(n)
+    result = []
+    for g in Permutation.group(n):
+        entry = 0
+        for i in range(len(mats)):
+            entry += mats[i].shape[0] * np.trace(reps[g.inverse()][i] @ mats[i])/n_fac
+        result.append(round(entry, 10))
+    return result
+
+def inverse_dft_natural(mats: list, n: int) -> list:
+    n_fac = math.factorial(n)
+    reps = matrix_rep_natural(n)
+    result = []
+    for g in Permutation.group(n):
+        entry = 0
+        for i in range(len(mats)):
+            entry += mats[i].shape[0] * np.trace(reps[g.inverse()][i] @ mats[i])/n_fac
+        result.append(round(entry, 10))
+    return result
+
+
+def projection(function, n, *args):
+    frequency = dft(function, n)
+    for i in range(len(frequency)):
+        if i not in args:
+            frequency[i] = np.zeros((frequency[i].shape[0], frequency[i].shape[1]))
+    return inverse_dft(frequency, n)
 
 def dft_natural(f: Callable[[Permutation, int], int], n: int) -> list:
     """
@@ -81,7 +164,7 @@ def matrix_rep(n: int) -> dict:
 def matrix_rep_natural(n: int) -> dict:
     """
     n--int n in S_n
-    returns a dict every permutation in Sn to it's orthogonal matrix representation
+    returns a dict every permutation in Sn to it's natural matrix representation
     """
     # Create dictionary representation the DFT for the generates of Sn (adjacent transpositions)
     rho_gen = matrix_rep_gen_natural(n)
@@ -170,7 +253,7 @@ def matrix_rep_gen_natural(n: int) -> dict:
     """
     partitions = sort_partitions(generate_partitions(n))
     tableaux_by_shape = [Tableau.gen_by_shape(n, partition) for partition in partitions]
-    print(tableaux_by_shape)
+ #    print(tableaux_by_shape[2])
     rho = {}
     # Loop over numbers 1 through n-1 to represent adjacent transpositions (1,2) to (n-1,n)
     for i in range(1,n):
@@ -179,6 +262,8 @@ def matrix_rep_gen_natural(n: int) -> dict:
             Tableau.sort(shape)
             rep = np.zeros((len(shape), len(shape))) # Representations are indexed by standard tableaux of a given shape
             for index in range(len(shape)):          # Loop over tableaux to fill in matrices
+                # if i == 1 and len(shape[0].data) == 3:
+                #     print(shape)
                 tableau = Tableau(shape[index].data) # Create a temporary variable name for the current tableau
                 col = 0
                 in_same_row = False
@@ -188,7 +273,8 @@ def matrix_rep_gen_natural(n: int) -> dict:
                         col = tableau.data[row].index(i)
                         if i+1 in tableau.data[row]:
                             in_same_row = True
-                            for new_tableau, value in find_garnir_element(tableau, i, row, col, tableau.data[row].index(i+1)):
+                            tableau_with_descent = Tableau(copy.deepcopy(tableau.data)).apply_permutation(Permutation.cycle(i, i+1))
+                            for new_tableau, value in find_garnir_element(tableau_with_descent, i, i+1, row, col, tableau.data[row].index(i+1)):
                                 new_tableau_index = 0
                                 for j in range(len(shape)):     # Find the index of the resulting standard tableau
                                     if shape[j] == new_tableau:  
@@ -207,39 +293,143 @@ def matrix_rep_gen_natural(n: int) -> dict:
                         if shape[j] ==  tableau.switch(i):  
                             switched_index = j
                             break
+#                    if tableau == Tableau([[1, 3, 4], [2, 5]]) and i == 2:
+#                        print(tableau, tableau.switch(i), switched_index, shape)
                     rep[switched_index, index] = 1
             representation.append(rep) # Add this representation to the list of representations
-        print(i, i+1)
-        for rep in representation:
-            print(rep)
+        # print(i, i+1)
+        # for rep in representation:
+        #     print(rep)
         rho[Permutation.cycle(i, i+1)] = representation # Add representation to dictionary
     return rho
 
-def find_garnir_element(tableau, i, row_i, col_i, col_i_plus_one):
+# def matrix_rep_gen_natural(n: int) -> dict:
+#     """
+#     n--int n in S_n
+#     returns a dict that maps the generators of S_n to their orthogonal matrix representations
+#     """
+#     partitions = sort_partitions(generate_partitions(n))
+#     tableaux_by_shape = [Tableau.gen_by_shape(n, partition) for partition in partitions]
+#     rho = {}
+#     # Loop over numbers 1 through n-1 to represent adjacent transpositions (1,2) to (n-1,n)
+#     for i in range(1,n):
+#         representation = []
+#         for shape in tableaux_by_shape:
+#             Tableau.sort(shape)
+#             rep = np.zeros((len(shape), len(shape))) # Representations are indexed by standard tableaux of a given shape
+#             for index in range(len(shape)):          # Loop over tableaux to fill in matrices
+#                 tableau = Tableau(shape[index].data) # Create a temporary variable name for the current tableau
+#                 col = 0
+#                 in_same_row = False
+#                 in_same_column = False
+#                 for row in range(len(tableau.data)):
+#                     if i in tableau.data[row]:
+#                         col = tableau.data[row].index(i)
+#                         if i+1 in tableau.data[row]:
+#                             in_same_row = True
+#                             col_i_plus_one = tableau.data[row].index(i+1)
+#                             tableau_with_descent = Tableau(copy.deepcopy(tableau.data))
+#                             tableau_with_descent.data[row][col] = i+1
+#                             tableau_with_descent.data[row][col_i_plus_one] = i
+#                             indices = same_row_coeff(tableau_with_descent, index, shape, i, i+1, row, col_i_plus_one, col)
+#                         else:
+#                             for r in range(row, len(tableau.data)):
+#                                 if len(tableau.data[r]) > col and tableau.data[r][col] == i+1:
+#                                     indices = same_col_coeff(tableau, index, shape, i, i+1, row, r, col)
+#                                     in_same_column = True
+#                             if not in_same_row and not in_same_column:
+#                                 row_i_plus_one, col_i_plus_one = tableau.find(i+1)
+#                                 switched = tableau.switch(i)
+#                                 indices = no_sharing_coeff(switched, index, shape, i, i+1, row_i_plus_one, col_i_plus_one, row, col)
+#                 for row, col, val in indices:
+#                     rep[row][col] = val
+#             representation.append(rep) # Add this representation to the list of representations
+#         rho[Permutation.cycle(i, i+1)] = representation # Add representation to dictionary
+#     return rho
+
+
+# def same_row_coeff(tableau, index, shape, i, j, row, col_i, col_j):
+#     a = {tableau.data[row][col_i] for row in range(row, len(tableau.data)) if len(tableau.data[row]) > col_i}
+#     b = {tableau.data[row][col_j] for row in range(0, row + 1)}
+#     # if len(a) == 1 and len(b) == 1:
+#     #     switched_tableau = Tableau(copy.deepcopy(tableau.data))
+#     #     switched_tableau.data[row_i][col_i] = j
+#     #     switched_tableau.data[row_j][col_j] = i
+#     #     for j in range(len(shape)):
+#     #         if shape[j] == switched_tableau:
+#     #             return [(index, index, - 1)]
+#     c = a.union(b)
+#     result = []
+#     for a_prime in combinations(c, len(a)):
+#         b_prime_list = sorted(list(c.difference(set(a_prime))))
+#         a_prime_list = sorted(list(a_prime))
+#         print(tableau)
+#         print(a_prime_list, b_prime_list)
+#         new_data = copy.deepcopy(tableau.data)
+#         for r in range(len(new_data)):
+#             if r <= row:
+#                 new_data[r][col_j] = b_prime_list[r]
+#             if r >= row:
+#                 if len(new_data[r]) <= col_i:
+#                     break
+#                 new_data[r][col_i] = a_prime_list[r - row]
+#         new_tableau = Tableau(new_data)
+#         if new_tableau != tableau:
+#             row_desc = new_tableau.row_descent()
+#             print(new_tableau)
+#             perm_diff_sgn = tableau.permutation_difference(new_tableau).sign
+#             if row_desc != []:
+#                 result += same_row_coeff(new_tableau, index, shape, *row_desc[0])
+#             else:
+#                 tab_no_col_desc = new_tableau.eliminate_column_descents()
+#                 col_desc_factor = new_tableau.permutation_difference(tab_no_col_desc).sign
+#                 for j in range(len(shape)):
+#                     if shape[j] == tab_no_col_desc:
+#                         result.append((j, index,  - perm_diff_sgn * col_desc_factor))
+#                         break
+#     return result
+
+# def same_col_coeff(tableau, index, shape, i, j, row_i, row_j, col):
+#     return [(index, index, -1)]
+
+# def no_sharing_coeff(tableau, index, shape, i, j, row_i, row_j, col_i, col_j):
+#     for i in range(len(shape)):
+#         if shape[i] == tableau:
+#             return [(i, index, 1)]
+
+def find_garnir_element(tableau, i, j, row_i, col_i, col_j):
     a = {tableau.data[row][col_i] for row in range(row_i, len(tableau.data)) if len(tableau.data[row]) > col_i}
-    b = {tableau.data[row][col_i_plus_one] for row in range(0, row_i + 1)}
+    b = {tableau.data[row][col_j] for row in range(0, row_i + 1)}
     if len(a) == 1 and len(b) ==1:
-        return [(tableau, 1)]
+        tableau_copy = Tableau(copy.deepcopy(tableau.data))
+        return [(tableau_copy.apply_permutation(Permutation.cycle(i, j)), 1)]
     c = a.union(b)
     tableaux_with_sign = []
     for a_prime in combinations(c, len(a)):
         b_prime = c.difference(set(a_prime))
-        if min(a_prime) < max(b_prime):
-            a_prime_list = sorted(list(a_prime))
-            b_prime_list = sorted(list(b_prime))
-            new_data = copy.deepcopy(tableau.data)
-            for row in range(len(new_data)):
-                if row <= row_i:
-                    new_data[row][col_i_plus_one] = b_prime_list[row]
-                if row >= row_i:
-                    if len(new_data[row]) <= col_i:
-                        break
-                    new_data[row][col_i] = a_prime_list[row - row_i]
-            new_tableau = Tableau(new_data)
-            tableaux_with_sign.append((new_tableau, tableau.permutation_difference(new_tableau).sign))
-    print(i)
-    for pair in tableaux_with_sign:
-        print(pair)
+#         if min(a_prime) < max(b_prime):
+            # if tableau == Tableau([[1,2], [4, 3], [5]]):
+            #     print(a_prime, b_prime)
+        a_prime_list = sorted(list(a_prime))
+        b_prime_list = sorted(list(b_prime))
+        new_data = copy.deepcopy(tableau.data)
+        for row in range(len(new_data)):
+            if row <= row_i:
+                new_data[row][col_j] = b_prime_list[row]
+            if row >= row_i:
+                if len(new_data[row]) <= col_i:
+                    break
+                new_data[row][col_i] = a_prime_list[row - row_i]
+        new_tableau = Tableau(new_data)
+        if new_tableau != tableau:
+            row_desc = new_tableau.row_descent()
+            perm_diff_sgn = tableau.permutation_difference(new_tableau).sign
+            if row_desc != []:
+                tableaux_with_sign += [(tab, - perm_diff_sgn * sign) for tab, sign in find_garnir_element(new_tableau, *row_desc[0])]
+            else:
+                tab_no_col_desc = new_tableau.eliminate_column_descents()
+                col_desc_factor = new_tableau.permutation_difference(tab_no_col_desc).sign
+                tableaux_with_sign.append((new_tableau, - perm_diff_sgn * col_desc_factor))
     return tableaux_with_sign
 
 def generate_partitions(n: int) -> list:
