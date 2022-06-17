@@ -56,6 +56,46 @@ def fixed_points(sigma: Permutation, n: int) -> int:
             count += 1
     return count
 
+def pairs_of_fixed_points(sigma: Permutation, n: int) -> int:
+    ''' Returns the number of pairs of fixed points in a permutation'''
+    count = 0
+    for i, j in combinations(list(range(1, n+1)), 2):
+        count += 2 * int(sigma(i) == i and sigma(j) == j)
+    return count
+
+def unordered_fixed_points(sigma: Permutation, n: int) -> int:
+    ''' Returns the number of pairs of fixed points in a permutation'''
+    count = 0
+    for i, j in combinations(list(range(1, n+1)), 2):
+        count += int(sigma(i) == i and sigma(j) == j)
+        count += int(sigma(i) == j and sigma(j) == i)        
+    return count
+
+def count_cycles(k: int) -> int:
+    ''' Returns a function that counts the number of k-cycles in a permutation'''
+    def f(sigma, n):
+        count = 0
+        for sets in combinations(list(range(1, n+1)), k):
+            current = sets[0]                  # Pick an arbitrary  element in the k-cycle to start the cycle
+            cycle_length = 0                   # Keep track of the cycle length
+            while current in sets:             # If we map outside of the current k-set, go to the next k-set
+                current = sigma(current)       # Update the value and cycle length
+                cycle_length += 1
+                if current == sets[0]:         # If we have completed the cycle and it is the correct length,
+                    if cycle_length == k:      # count the cycle, otherwise move on to the next cycle
+                        count += 1
+                    else:
+                        break
+        return count
+    return f
+
+def mapping_indicator(sigma, indices, images):
+    ''' Return true if sigma(indices) = images, false otherwise'''
+    for i in range(len(indices)):
+        if sigma(indices[i]) != images[i]:
+            return False
+    return True
+
 def power_function(function, k):
     return (lambda sigma, n: function(perm_pow(sigma, k), n))
 
@@ -115,6 +155,10 @@ def w_ij_kl(i: int, j: int, k: int, l: int) -> Callable[[Permutation, int], int]
     and returns 1 if sigma maps k to i and l to j, and 0 otherwise
     """
     return (lambda sigma, n: int(sigma(k) == i and sigma(l) == j))
+
+def w_ij_kl_unordered(i: int, j: int, k: int, l:int) -> Callable[[Permutation, int], int]:
+    ''' Return true if {k,l} -> {i,j} '''
+    return (lambda sigma, n: int((sigma(k) == i and sigma(l) == j) or (sigma(l) == i and sigma(k) == j)))
 
 def w_gen(pattern: list, indices: list, sigma):
     for i in range(len(indices)):

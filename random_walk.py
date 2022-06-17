@@ -6,6 +6,7 @@ from typing import Callable
 import numpy as np
 import perm_stats
 import misc
+from itertools import combinations
 from dft import dft
 
 ## This file needs clean up ##
@@ -46,6 +47,19 @@ def w_ij_kl_mat(sigma: Permutation, n: int) -> np.array:
                             shift_kl += 1
             else:
                 shift_ij += 1
+    return mat
+
+def w_ij_kl_unordered_mat(sigma: Permutation, n: int) -> np.array:
+    dim = misc.choose(n, 2)
+    mat = np.zeros((dim, dim))
+    row = 0
+    one_n = list(range(1, n+1))
+    for i, j in combinations(one_n, 2):
+        col = 0
+        for k, l in combinations(one_n, 2):
+            mat[row, col] = perm_stats.w_ij_kl_unordered(i, j, k, l)(sigma, n)
+            col += 1
+        row += 1
     return mat
 
 def w_mat_sn(w: Callable[[Permutation, int], np.array], n: int) -> dict:
