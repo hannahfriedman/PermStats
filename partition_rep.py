@@ -6,6 +6,7 @@ from dft import dft
 from perm_stats import fixed_points
 import numpy as np
 
+### Starting to investigate partition algebras ###
 
 n = 5
 partitions = sort_partitions(generate_partitions(n))

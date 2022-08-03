@@ -5,7 +5,10 @@ from typing import Type
 from permutation import Permutation
 from itertools import combinations
 
+
+
 class Partition(object):
+    ''' Partition objects are essentially the same as tabloids but unordered '''
     def __init__(self, data: list) -> None:
         self.data = [set(row) for row in data]
         self.size = 0

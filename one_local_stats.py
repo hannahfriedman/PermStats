@@ -12,10 +12,11 @@ from misc import function_to_vector
 # S3 = [np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]), np.array([[1, 0, 0], [0, 0, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]), np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]), np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])]
 
 def generate_positions(n):
+    ''' Generate all possible pairs from which to create wij functions '''
     return product(list(range(n)), list(range(n)))
 
-
 def position_to_function(indices: tuple):
+    ''' Given a tuple or list of pairs (i, j), return a function that is sum of the associated wij functions'''
     def f(sigma, n):
         count = 0
         for i in indices:
@@ -26,26 +27,25 @@ def position_to_function(indices: tuple):
 
 
 def generate_reps(n):
-    sn = Permutation.group(n)
+    '''Generate permutation representations for all permutations in Sn'''
     result = []
-    for sigma in sn:
+    for sigma in Permutation.group(n):
         mat = np.zeros((n,n))
         for col in range(1, n+1):
             mat[sigma(col) - 1, col - 1] = 1
         result.append(mat)
     return result
 
-S3 = generate_reps(3)
-S4 = generate_reps(4)
-
-def powerset(iterable):
+def powerset(iterable) -> list:
+    '''Given some some iterable, treat the contents as set and return the powerset'''
     s = list(iterable)
     pow_set = []
     for i in range(0, len(s) + 1):
         pow_set += combinations(s, i)
     return pow_set
 
-def compute_dft_or(mats, indices):
+def compute_dft_or(mats, indices) -> np.array:
+    ''' Given the representations for Sn and the ij indices for the wijs, compute the permutation representation for the selected wijs'''
     n = mats[0].shape[0]
     result = np.zeros((n, n))
     for mat in mats:
@@ -53,10 +53,12 @@ def compute_dft_or(mats, indices):
         for index in indices:
             if mat[index] == 1:
                 count += 1
+        # For each wij in which the matrix appears, add it once
         result += count * mat
     return result
 
-def compute_dft_and(mats, indices):
+def compute_dft_and(mats, indices) -> np.array:
+    '''For every pair of wijs satisfied, add 1 one to the coefficient of the wij and sum '''
     n = mats[0].shape[0]
     result = np.zeros((n, n))
     for mat in mats:
@@ -70,44 +72,34 @@ def compute_dft_and(mats, indices):
         result += count * mat
     return result
 
-# def compute_dft_and_three(mats, indices):
-#     n = mats[0].shape[0]
-#     result = np.zeros((n, n))
-#     sets_of_indices = combinations(indices, 3)
-#     for mat in mats:
-#         count = 0
-#         for pair in sets_of_indices:
-#             if mat[pair[0]] == 1 and mat[pair[1]] == 1 and mat[pair[2]] == 2:
-#                 count += 1
-#         result += count * mat
-#     return result
-
-
-def determine_real(vec):
+def determine_real(vec) -> bool:
+    ''' Given a comple vector, return True if it is real and False otherwise'''
     return np.isreal(np.round_(vec, 7)).all()
 
-def determine_int(vec):
+def determine_int(vec) -> bool:
+    '''Return true if the vector is integer valued'''
     return (np.round_(vec) == np.round_(vec, 7)).all()
 
-def make_subplots(indices, nrows, ncols, n):
+def make_subplots(indices: list, nrows: int, ncols: int, n: int) -> None:
+    '''
+    indices is a list of lists, each of which corresponds to a matrix and indicates which entries are one (not zero)
+    nrows and ncols indicates the dimension of the subplot
+    '''
     for i in range(len(indices)):
+        # find matrix to plot
         m = np.zeros((n, n))
         for index in indices[i]:
             m[index] = 1
+        # creat subplot
         plt.subplot(nrows, ncols, i+1)
         plt.imshow(m, vmin=0, vmax=1)
         plt.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False, labeltop = False)
     plt.show()
 
-def compute_distribution(vector, n):
-    distribution = (n+1) * [0]
-    for entry in vector:
-        distribution[entry] += 1
-    return distribution
-
-    
 n = 4
 positions = generate_positions(n)
+
+### Partition by distribution ###
 
 d = {}
 for index in combinations(positions, 6):
@@ -118,7 +110,9 @@ for index in combinations(positions, 6):
         d[v] = [index]
 big_d = {}
 for key in d.keys():
-    distribution = compute_distribution(key, n)
+    distribution = (n+1) * [0]
+    for entry in key:
+        distribution[entry] += 1
     dist = tuple(distribution)
     if dist in big_d.keys():
         big_d[dist] += d[key]
@@ -127,13 +121,22 @@ for key in d.keys():
 # print(len(big_d))
 # make_subplots(big_d[(1, 11, 11, 1, 0)], 30, 30, n)
 
+# This function is used in some other file, but should be renamed
 def f():
     return list(d.keys())
+
+
 # for key in big_d.keys():
 #     print(key)
 #     make_subplots(big_d[key], 30, 30, n)
 
-## Plot Eigenvalues ##
+
+
+
+
+
+
+### Plot Eigenvalues ###
 
 # eigs = []
 # for index in powerset(positions):
@@ -163,7 +166,10 @@ def f():
 # ax.scatter(eig_vec.real, eig_vec.imag, c=eig_vec.real, cmap="RdYlBu_r")
 # plt.show()
 
-## Partition according to real/integer ##
+
+
+
+### Partition according to real/integer ### 
 
 # real_int = []
 # complex_int = []
@@ -193,6 +199,10 @@ def f():
 # make_subplots(real_non_int, 9, 10, 3)
 # make_subplots(complex_non_int, 10, 10, 3)
 
+
+
+
+
 ## Partition according to rank ##
 
 # ranks = [[], [], [], []]
@@ -219,6 +229,9 @@ def f():
 # make_subplots(ranks[2], 15, 16, 3)
 # make_subplots(ranks[3], 16, 17, 3)
 # print([(0,0)] == [(0,0)] )
+
+
+
 
 ## Partition according to rank ##
 
@@ -247,6 +260,9 @@ def f():
 #         if determine_real(np.linalg.eig(compute_dft_or(S3, indices[i]))[0]) != real or determine_int(np.linalg.eig(compute_dft_or(S3, indices[i]))[0]) != integer:
 #             print(i)
 #             show = True
+
+
+
 
 
 ## Plot eigenvalues by rotation ##

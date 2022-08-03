@@ -10,6 +10,8 @@ from one_local_stats import make_subplots
 from misc import function_to_vector
 from misc import distribution
 
+### Was originally created to determine sizes of orbits of one local functions under the action of Sn X Sn ###
+
 class Equivalence(object):
 
     def __init__(self, funcs, mats):

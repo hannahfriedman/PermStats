@@ -5,6 +5,8 @@ from typing import Type
 from permutation import Permutation
 from itertools import combinations
 
+'''Tabloid class based on tableau class'''
+
 class Tabloid(object):
     def __init__(self, data: list) -> None:
         self.data = [set(row) for row in data]
@@ -83,5 +85,3 @@ class Tabloid(object):
     @staticmethod
     def generate_by_shape(partition: list, n: int):
         return [Tabloid(t) for t in Tabloid.gen_by_shape_helper(set(range(1, n+1)), partition)]
-    
-    
