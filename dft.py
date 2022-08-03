@@ -13,7 +13,9 @@ import perm_stats
 #Docs for Permutation class: 
 #https://permutation.readthedocs.io/en/stable/_modules/permutation.html#Permutation.cycle
 
-def one_local_dft_natural(wij_indices, n):
+def one_local_dft_natural(wij_indices: list, n: int) -> list:
+    ''' Given a list tuples of the form (i, j, c), this function returns the first two representations 
+    using Young's natural representation of the sum of cwij '''
     result = [np.zeros((1,1)), np.zeros((n-1, n-1))]
     for i, j, c in wij_indices:
         result[0] = result[0] + np.array([[math.factorial(n-1)*c]])
@@ -21,7 +23,8 @@ def one_local_dft_natural(wij_indices, n):
     return result
         
 
-def wij_dft_n_minus_one_one(i, j, n):
+def wij_dft_n_minus_one_one(i: int, j: int, n: int):
+    ''' Return the (n-1, 1) representation of wij using YNR '''
     result = np.zeros((n-1, n-1))
     if j == 1:
         for row in range(n-1):
@@ -38,7 +41,8 @@ def wij_dft_n_minus_one_one(i, j, n):
             result[row, j - 2] = val_to_add
     return result
 
-def dft_matrix(f: Callable[[Permutation, int], int], n: int):
+def dft_matrix(f: Callable[[Permutation, int], int], n: int) -> np.array:
+    ''' Returns the dft of f as a block diagonal matrix using YOR'''
     ft = dft(f, n)
     result = np.array(ft[0])
     for mat in ft[1:]:
@@ -86,6 +90,7 @@ def dft(f: Callable[[Permutation, int], int], n: int) -> list:
 
 
 def inverse_dft(mats: list, n: int) -> list:
+    ''' Returns the inverse dft given a list of matrices'''
     n_fac = math.factorial(n)
     reps = matrix_rep(n)
     result = []
@@ -108,13 +113,15 @@ def inverse_dft_natural(mats: list, n: int) -> list:
     return result
 
 
-def projection(function, n, *args):
+def projection(function: Callable[[Permutation, int], int], n: int, *args) -> list:
+    ''' Project f into the frequency spaces listed in args'''
     frequency = dft(function, n)
     for i in range(len(frequency)):
-        if i not in args:
+        if i not in args: # Replace the spaces not wanted with zeros
             frequency[i] = np.zeros((frequency[i].shape[0], frequency[i].shape[1]))
     return inverse_dft(frequency, n)
 
+# All dft natural functions are still buggy
 def dft_natural(f: Callable[[Permutation, int], int], n: int) -> list:
     """
     Returns the DFT of Sn with f(sigma) as the coefficient of sigma for all sigma in Sn

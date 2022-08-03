@@ -29,12 +29,17 @@ three_four = np.array([[1, 0, 0], [0, 0, 1], [0, 1, 0]])
 # # w34 23
 # print(two_three @ three_four + one_two @ two_three @ three_four)
 
-def one_local_w_ij_kl_dft(wijkls, n):
+def two_local_w_ij_kl_dft(wijkls, n):
     partitions = sort_partitions(generate_partitions(n))
     tableaux_by_shape = [Tableau.gen_by_shape(n, partition) for partition in partitions]
     for i in range(0, 3):
         Tableau.sort(tableaux_by_shape[i])
-    return [np.array([[factorial(n - 2) * len(wijkls)]]), sum([n_minus_one_one(*wijkl, n) for wijkl in wijkls]), sum([n_minus_two_one_one(*wijkl, tableaux_by_shape[3], n) for wijkl in wijkls])]
+    n_min_one_one = sum([n_minus_one_one(*wijkl, n) for wijkl in wijkls])
+    for wijkl in wijkls:
+        if type(n_minus_two_one_one(*wijkl, tableaux_by_shape[3], n)) == type(None):
+            print(wijkl)
+    n_min_two_one_one = sum([n_minus_two_one_one(*wijkl, tableaux_by_shape[3], n) for wijkl in wijkls])
+    return [np.array([[factorial(n - 2) * len(wijkls)]]), n_min_one_one, np.zeros((n*(n-3)//2, n*(n-3)//2)),  n_min_two_one_one]
 
 def n_minus_one_one(i, j, k, l, n):
     result = np.zeros((n-1, n-1))

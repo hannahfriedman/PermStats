@@ -21,10 +21,16 @@ from math import factorial
 import matplotlib.pyplot as plt
 from misc import function_to_vector
 from misc import distribution
+from misc import matlab_syntax
 from itertools import combinations
 from sympy import Matrix
 from decompress import T_w_ij_kl
-n = 5
+from w_ij_basis import generate_dft_m_w_ij_kl
+from small_dft import two_local_w_ij_kl_dft
+from itertools import product
+
+
+n = 6
 sn = [g for g in Permutation.group(n)]
 def compare_with_action(set1, set2, sigma, tau):
     set3 = set([sigma * pi * tau for pi in set2])
@@ -32,34 +38,89 @@ def compare_with_action(set1, set2, sigma, tau):
 def counts(vector, val):
     return [sn[i] for i in range(len(sn)) if vector[i] == val]
 
+def inversion_locations(shape: list) -> list:
+    locations = []
+    row_sum = 0
+    for row in range(1, len(shape)+1):
+        for current in range(1, shape[row-1] + 1):
+            for col in range(current + 1, shape[row-1] + 1):
+                locations.append((row_sum + current, row_sum + col))
+            for r in range(row+1, len(shape) + 1):
+                if shape[r-1] > current - 1:
+                    locations.append((row_sum + current, sum(shape[:r-1]) + current))
+                else:
+                    break
+        row_sum += shape[row-1]
+    return locations
+
+
+
+def inversion_values(n):
+    values = []
+    for i in range(2, n+1):
+        for j in range(1, i):
+            values.append((i, j))
+    return values
+    
+                
+n = 6
+# print(inversion_locations((2,2, 2)))
+
+
+# print(np.round_(np.linalg.eig(representation(distance_from_standard((4, 2), n), w_ij_kl_mat, n*(n-1), n, False))[0], 10))
+# print(np.round_(np.linalg.eig(representation(distance_from_standard((2,2,2), n), w_ij_kl_mat, n*(n-1), n, False))[0], 10))
+# print(np.round_(np.linalg.eig(representation(distance_from_standard((3,3), n), w_ij_kl_mat, n*(n-1), n, False))[0], 10))
+# matlab_syntax(representation(distance_from_standard((4, 2), n), w_ij_kl_mat, n*(n-1), n, False))
+# matlab_syntax(representation(distance_from_standard((2,2, 2), n), w_ij_kl_mat, n*(n-1), n, False))
+ft1 = two_local_w_ij_kl_dft([(*a, *b) for a, b in product(inversion_values(n), inversion_locations((4, 2)))], n)
+ft2 = two_local_w_ij_kl_dft([(*a, *b) for a, b in product(inversion_values(n), inversion_locations((2, 2, 2)))], n)
+for i in range(len(ft1)):
+#     print(ft1[i] - ft2[i])    
+    print(np.round_(misc.similar(ft1[i], ft2[i]), 10))
+
+# for m in ft1:
+#     print(m)
+#     print(np.round_(np.linalg.eig(m)[0], 10))
+# for m in ft2:
+#     print(m)
+#     print(np.round_(np.linalg.eig(m)[0], 10))    
+
+# for i in range(len(ft1, ft2)):
+# print(misc.similar(representation(distance_from_standard((2,2,2), n), w_ij_kl_mat, n*(n-1), n, False), representation(distance_from_standard((4, 2), n), w_ij_kl_mat, n*(n-1), n, False)))
+
 # print(projection(distance_from_standard([3, 1, 1], n), n, 1))
 # Parititons for n = 4:
 # [(4,), (3, 1), (2, 2), (2, 1, 1), (1, 1, 1, 1)]
 
+n = 5
 
-# for partition in sort_partitions(generate_partitions(n)):
+for partition in sort_partitions(generate_partitions(n)):
+    print(partition)
+    for e in np.round_(np.linalg.eig(representation(distance_from_standard(partition, n, method=0), w_ij_kl_mat, n*(n-1), n, False))[0], 10):
+        if e != 0:
+            print(e)
 # for partition in [(3, 1, 1), (2, 2, 1)]:
-ft1 = dft_natural(distance_from_standard((3, 1, 1), n), n)
-ft2 = dft_natural(distance_from_standard((2, 2, 1), n), n)
-for m in ft1:
-    print(m)
-for m in dft_natural(misc.vector_to_function(inverse_dft_natural(ft1, n), n), n):
-    print(m)
+# ft1 = dft_natural(distance_from_standard((3, 1, 1), n), n)
+# ft2 = dft_natural(distance_from_standard((2, 2, 1), n), n)
+# # for m in ft1:
+# #     print(m)
+# # for m in dft_natural(misc.vector_to_function(inverse_dft_natural(ft1, n), n), n):
+# #     print(m)
 
-diff = [misc.similar(ft1[i], ft2[i]) for i in range(len(ft1))]
-preimage = inverse_dft_natural(diff, n)
+# diff = [misc.similar(ft1[i], ft2[i]) for i in range(len(ft1))]
+# preimage = inverse_dft_natural(diff, n)
 
-int_pre_image = np.round_(360*np.array(preimage), 5)
-two_local_part = projection(misc.vector_to_function(int_pre_image, n), n, 0, 1, 2, 3)
-print(two_local_part)
-neg_sum = 0
-pos_sum = 0
-for i in range(len(two_local_part)):
-    if two_local_part[i] <= 0:
-        neg_sum += two_local_part[i]
-    else:
-        pos_sum += two_local_part[i]
-print(neg_sum, pos_sum)
+# int_pre_image = np.round_(360*np.array(preimage), 5)
+# two_local_part = projection(misc.vector_to_function(int_pre_image, n), n, 0, 1, 2, 3)
+# # print(two_local_part)
+# neg_sum = 0
+# pos_sum = 0
+# for i in range(len(two_local_part)):
+#     if two_local_part[i] <= 0:
+#         neg_sum += two_local_part[i]
+#     else:
+#         pos_sum += two_local_part[i]
+# print(neg_sum, pos_sum)
 
 # dft_vec = T_w_ij_kl(n)@ np.array(two_local_part)
 # print(dft_vec)
@@ -116,8 +177,8 @@ print(neg_sum, pos_sum)
 
 #    plt.show()
 
-# for sigma in Permutation.group(n):
-#     print(distance_from_standard(sigma, n), length(sigma, n))
+for sigma in Permutation.group(n):
+    print(distance_from_standard((2,2,1), n, method=0)(sigma, n), distance_from_standard((3, 2), n, method=0)(sigma, n), length(sigma, n))
 
 # for n in range(3, 8):
 #     base = dft(length, n-1)[0][0,0]

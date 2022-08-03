@@ -4,6 +4,10 @@ import random_walk
 from permutation import Permutation
 import numpy as np
 import seaborn as sns
+from copy import deepcopy
+from small_dft import two_local_w_ij_kl_dft
+from dft import one_local_dft_natural
+from misc import dft_to_vector
 
 from random import *
 import math
@@ -82,10 +86,80 @@ def T_w_ij(n: int) -> np.matrix:
     for sigma in Permutation.group(n):
         # Loop over rows
         for row in range(n**2):
-            result[row, col] = w_ij(listOfPairs[row][0], listOfPairs[row][1])(sigma, n)
+            # result[row, col] = w_ij(listOfPairs[row][0], listOfPairs[row][1])(sigma, n)
+            result[row, col] = int(sigma(listOfPairs[row][1]) == listOfPairs[row][0])
         col += 1
 
     return result
+
+def T_w_ij_fast(n: int) -> np.matrix:
+    '''
+    Returns an n^2 x n! matrix whose row vectors are wij functions ordered as
+    (1,1), (1,2), ..., (1,n), (2, 1), ..., (2, n), ..., (n, 1), ..., (n,n)
+    The columns are indexed by elements of Sn
+    '''
+    result = np.zeros((n**2, math.factorial(n)))
+    # we will use these pairs to create our wij functions
+    perm_indices = {}
+    index = 0
+    for sigma in Permutation.group(n):
+        perm_indices[sigma] = index
+        index += 1
+    # for i in range(math.factorial(n-1)):
+    #     result[n**2 - 1, i] = 1
+    transpositions = [Permutation.cycle(i, n) for i in range(1, n)] + [Permutation()]
+    for sigma in Permutation.group(n-1):
+        row = 0
+        for left in transpositions:
+            left_shift = left * sigma
+            for right in transpositions:
+                result[row, perm_indices[left_shift * right]] = 1
+                row += 1
+    return result
+
+def T_w_ij_rec(n):
+    if n == 1:
+        return np.array([[1]])
+    prev = T_w_ij_rec(n-1)
+    anti_diag = np.zeros((n, math.factorial(n-1)))
+    anti_diag[-1] = np.ones((math.factorial(n-1)))
+    available_blocks = [np.vstack((prev[k * (n-1):(k+1) *  (n-1)], np.zeros((math.factorial(n-1))))) for k in range(n-1)] + [anti_diag]
+#     print(prev)
+#    print(available_blocks)
+    # result = np.zeros((n**2, math.factorial(n)))
+    blocks = [np.concatenate(tuple(available_blocks), axis=0)]
+    for col in range(0, n-1):
+        new = deepcopy(blocks[-1])
+        new[(n - 2 - col) * n : (n - 1 - col) * n] = blocks[-1][(n - 1 - col) * n : (n - col) * n]
+        new[(n - 1 - col) * n : (n - col) * n] = blocks[-1][(n - 2 - col) * n : (n - 1 - col) * n]
+        blocks.append(new)
+        # blocks.append(np.concatenate(tuple(available_blocks), axis=0))
+        # available_blocks[n - 1 - col], available_blocks[n - col] = available_blocks[n - col], available_blocks[n - 1 - col]
+    return np.concatenate(tuple(blocks), axis=1)
+
+def T_w_ij_rec_fast(n):
+    if n == 1:
+        return np.array([[1]])
+    prev = T_w_ij_rec_fast(n-1)
+    anti_diag = np.zeros((n, math.factorial(n-1)))
+    anti_diag[-1] = np.ones((math.factorial(n-1)))
+    available_blocks = [np.vstack((prev[k * (n-1):(k+1) *  (n-1)], np.zeros((math.factorial(n-1))))) for k in range(n-1)] + [anti_diag]
+    result = np.zeros((n**2, math.factorial(n)))
+    for col in range(n):
+        for row in range(n):
+            if row + col < n:
+                result[row*n:(row+1)*n, col*math.factorial(n-1):(col+1)*math.factorial(n-1)] = available_blocks[row]
+            elif row + col == n:
+                result[row*n:(row+1)*n, col*math.factorial(n-1):(col+1)*math.factorial(n-1)] = available_blocks[-1]
+            else:
+                result[row*n:(row+1)*n, col*math.factorial(n-1):(col+1)*math.factorial(n-1)] = available_blocks[row - 1]
+    return result
+
+    
+# Big Idea:
+# Compute w_n,n and store the indices of the permutations in a dictionary so that d[sigma] = index
+# Act with transpositions on both sides to generate w_i,j
+
 
 def TstarT_w_ij(n: int) -> np.matrix:
     '''
@@ -106,6 +180,15 @@ def w_ij_vector(i: int, j: int, n: int) -> np.matrix:
         M[row, 0] = w_ij_function(sigma, n)
         row += 1
     return M
+
+def T_w_ij_natural(n: int):
+    result = np.zeros((n**2, 1 + (n-1)**2))
+    row = 0
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            result[row] = dft_to_vector(one_local_dft_natural([(i, j, 1)], n))
+            row += 1
+    return result
 
 ## Generate T matrices for S3 - S6 ##
 # A3 = T_w_ij(3)
@@ -215,6 +298,20 @@ def w_ij_kl_vector(i: int, j: int, k:int, l:int, n: int) -> np.matrix:
         M[row, 0] = w_ij_kl_function(sigma, n)
         row += 1
     return M
+
+def T_w_ij_kl_natural(n: int) -> np.matrix:
+    result = np.zeros(((n*(n-1))**2,1 +(n-1)**2 + n**2*(n-3)**2//4 + (n-1)**2 * (n-2)**2//4))
+    row = 0
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            if i != j:
+                for k in range(1, n+1):
+                    for l in range(1, n+1):
+                        if k != l:
+                            result[row] = dft_to_vector(two_local_w_ij_kl_dft([(i,j,k,l)], n))
+    return result
+                                                        
+    
 
 def permutation_representation(sigma: Permutation, n: int) -> np.matrix:
     '''

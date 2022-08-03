@@ -100,23 +100,32 @@ class Tableau(object):
         switched_tableau.data[k_plus_one_row][k_plus_one_col] = k
         return switched_tableau
 
-    def dist_from_standard(self):
+    def dist_from_standard(self, method=0):
         ''' 
         Computes the distance of tableau from being standard, i.e. the inversions in a tableau
         '''
         dist = 0
-        for row in range(len(self.data)):
-            for col in range(len(self.data[row])):
-                # Find inversions at self.data[row][col]
-                for i in range(col + 1, len(self.data[row])):
-                    if self.data[row][col] > self.data[row][i]:
-                        dist += 1
-                if row < len(self.data) - 1:# and len(self.data[row + 1]) > col:
-                    for j in range(row+1, len(self.data)):
-                        if len(self.data[j]) <= col:
-                            break
-                        elif  self.data[row][col] > self.data[j][col]:
+        # print(self)
+        if method == 0:
+            for row in range(len(self.data)):
+                for col in range(len(self.data[row])):
+                    # Find inversions at self.data[row][col]
+                    for i in range(col + 1, len(self.data[row])):
+                        if self.data[row][col] > self.data[row][i]:
                             dist += 1
+                    if row < len(self.data) - 1:# and len(self.data[row + 1]) > col:
+                        for j in range(row+1, len(self.data)):
+                            if len(self.data[j]) <= col:
+                                break
+                            elif  self.data[row][col] > self.data[j][col]:
+                                dist += 1
+        elif method == 1:
+            for row in range(len(self.data)):
+                for col in range(len((self.data[row]))):
+                    if col < len((self.data[row])) - 1 and self.data[row][col] > self.data[row][col+1]:
+                        dist += 1
+                    if row < len(self.data) - 1 and col < len((self.data[row+1])) and self.data[row][col] > self.data[row+1][col]:
+                        dist += 1
         return dist
 
     def apply_permutation(self, sigma):

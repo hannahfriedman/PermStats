@@ -50,11 +50,15 @@ def generate_dft_m_w_ij_kl(n):
     dft_m = np.zeros(((n-1)**2 + 1 + ((n*(n - 3))//2)**2 + (((n - 1)*(n - 2))//2)**2, (n-1)**2 + 1 + ((n*(n - 3))//2)**2 + (((n - 1)*(n - 2))//2)**2))
     for sigma in Permutation.group(n):
         if inc_seq_k(sigma, n-2, n) > 0:
-            w_ijs = []
+            w_ij_kls = []
             for j in range(1, n+1):
                 for i in range(1, n+1):
-                    if w_ij(i, j)(sigma, n) == 1:
-                        w_ijs.append((i, j, 1))
+                    if i != j:
+                        for k in range(1, n+1):
+                            for l in range(1, n+1):
+                                if k != l:
+                                    if w_ij_kl(i, j, k, l)(sigma, n) == 1:
+                                        w_ijs.append((i, j, k, l, 1))
             dft_m[:, count] = mats_into_vec((n-1)**2 + 1, one_local_dft_natural(w_ijs, n))
             count += 1
     return dft_m
