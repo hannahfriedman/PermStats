@@ -28,7 +28,7 @@ def matlab_syntax(mat: np.array) -> None:
     '''
     string = "["
     for row in range(len(mat)):
-        for col in range(len(mat)):
+        for col in range(mat.shape[1]):
             string += " "
             string += str(mat[row, col])
         if row == len(mat) - 1:
