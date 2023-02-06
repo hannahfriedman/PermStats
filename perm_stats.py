@@ -117,6 +117,36 @@ def cycle_indicator(sigma: Permutation, n: int) -> int:
 def all_ones(sigma: Permutation, n: int) -> int:
     return 1
 
+def excedance_distance(sigma: Permutation, n: int) -> int:
+    tot = 0
+    for i in range(1, n+1):
+        tot += abs(sigma(i) - i)
+    return tot
+
+def cycle_count(sigma: Permutation, n: int) -> int:
+    return len(sigma.to_cycles())
+
+def lis(sigma: Permutation, n: int) -> int:
+    arr = list(sigma.to_image(n))
+
+    # Copied from https://www.geeksforgeeks.org/python-program-for-longest-increasing-subsequence/
+    lis = [1]*n
+ 
+    # Compute optimized LIS values in bottom up manner
+    for i in range (1, n):
+        for j in range(0, i):
+            if arr[i] > arr[j] and lis[i]< lis[j] + 1 :
+                lis[i] = lis[j]+1
+ 
+    # Initialize maximum to 0 to get the maximum of all
+    # LIS
+    maximum = 0
+ 
+    # Pick maximum of all LIS values
+    for i in range(n):
+        maximum = max(maximum, lis[i])
+ 
+    return maximum
 ########################################
 ## Functions that Generate Statistics ##
 ########################################
@@ -212,6 +242,23 @@ def average_tabloid_statistic(shape: tuple, n: int):
     for tab in Tabloid.generate_by_shape(shape, n):
         stat = function_sum(stat, tabloid_to_perm_stat(tab))
     return function_sum(None, stat)#, b_coeff=1/math.factorial(n))
+
+def is_increasing(sub_perm: list):
+    ''' Helper function for count_inc_seq '''
+    for i in range(0, len(sub_perm)-1):
+        if sub_perm[i] > sub_perm[i+1]:
+            return False
+    return True
+
+def count_inc_seq(k: int, n: int):
+    ''' return the  number of increasing subsequences of length n - k '''
+    def count_k_inc_seq(sigma: Permutation, n: int) -> int:
+        count = 0
+        for tup in combinations(range(1, n+1), k):
+            count += int(is_increasing([perm(i) for i in range(1, n+1) if i not in tup]))
+        return count
+    return count_k_inc_seq
+
 
 #########################
 ## Indicator Functions ##

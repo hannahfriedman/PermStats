@@ -37,7 +37,8 @@ def create_matrix():
     return m
 
 A = create_matrix()
-B = np.linalg.inv(np.transpose(A) @ A) @ np.transpose(A) 
+B = np.linalg.inv(np.transpose(A) @ A) @ np.transpose(A)
+
 
 # print(B)
 

@@ -1,6 +1,7 @@
 from tableau import Tableau
 from permutation import Permutation
 from perm_stats import w_ij_kl
+from perm_stats import excedance_distance
 from itertools import combinations
 
 def rs(sigma: Permutation, n):
@@ -41,7 +42,10 @@ def count_inc_seq(perm: Permutation, k: int, n: int):
     for tup in combinations(range(1, n+1), k):
 #        print([perm(i) for i in range(1, n) if i not in tup])
         count += int(is_increasing([perm(i) for i in range(1, n+1) if i not in tup]))
+        # if is_increasing([perm(i) for i in range(1, n+1) if i not in tup]):
+        #     print([perm(i) for i in range(1, n+1) if i not in tup])
     return count
+
 
 
 def count_perms(n, i, j, k, l, m):
@@ -52,10 +56,64 @@ def count_perms(n, i, j, k, l, m):
                 perms.append(sigma)
     return perms
 
-n = 7
+n = 5
+d = {}
 for sigma in Permutation.group(n):
-    if count_inc_seq(sigma, 2, n) == n - 1:
-        print(sigma)
+    count = count_inc_seq(sigma, 2, n)
+    if count in d.keys():
+        d[count].append(sigma)
+    else:
+        d[count] = [sigma]
+for key, val in d.items():
+    print( key, val)
+
+
+# tau = Permutation(3, 1, 2, 6, 4, 5)
+# for a, b in combinations(range(1, 7), 2):
+#     oij = []
+#     for sigma in Permutation.group(6):
+#         if sigma(a) == tau(a) and sigma(b) == tau(b):
+#             oij.append(sigma)
+#     works = True
+#     for sigma in oij:
+#         if count_inc_seq(sigma, 2, 6) >= count_inc_seq(sigma, 2, 6):
+#             works = False
+#             break
+#     if works:
+#         print(*oij, *[count_inc_seq(sigma, 2, 6) for sigma in oij])
+        
+
+# for sigma in Permutation.group(n):
+#     for tau in Permutation.group(n):
+#         if sigma != tau:
+#             if excedance_distance(sigma, n) > excedance_distance(tau, n):
+#                 if count_inc_seq(sigma, 2, n) > count_inc_seq(tau, 2, n):
+#                     print(sigma, excedance_distance(sigma, n), count_inc_seq(sigma, 2, n), tau, excedance_distance(tau, n), count_inc_seq(tau, 2, n))
+
+# print(count_inc_seq(Permutation(1, 2, 4, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(1, 2, 7, 3, 4, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(4, 2, 1, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(4, 2, 7, 3, 1, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(7, 2, 4, 3, 1, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(7, 2, 1, 3, 4, 5, 6), 4, 7))
+
+# print(count_inc_seq(Permutation(1, 2, 4, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(1, 4, 2, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(2, 1, 4, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(2, 4, 1, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(4, 2, 1, 3, 7, 5, 6), 4, 7))
+# print(count_inc_seq(Permutation(4, 1, 2, 3, 7, 5, 6), 4, 7))
+
+# print(count_inc_seq(Permutation(1, 7, 2, 6, 3, 5, 4), 4, 7))
+# print(count_inc_seq(Permutation(1, 7, 2, 6, 5, 3, 4), 4, 7))
+# print(count_inc_seq(Permutation(1, 7, 3, 6, 2, 5, 4), 4, 7))
+# print(count_inc_seq(Permutation(1, 7, 3, 6, 5, 2, 4), 4, 7))
+# print(count_inc_seq(Permutation(1, 7, 5, 6, 3, 2, 4), 4, 7))
+# print(count_inc_seq(Permutation(1, 7, 5, 6, 2, 3, 4), 4, 7))
+# n = 7
+# for sigma in Permutation.group(n):
+#     if count_inc_seq(sigma, 2, n) == n - 4:
+#         print(sigma.lehmer(n))
 # n = 5
 # count = 0
 # for i in range(1, n+1):
@@ -98,10 +156,10 @@ l = 4
 n = 5
 k = 2
 # for sigma in Permutation.group(n):
-    # P, Q = rs(sigma, n)
-    # if P.shape[0] == n - k:
-    #     print(count_inc_seq(sigma, k, n))
-    #     print(P, Q)
+#     P, Q = rs(sigma, n)
+#     if P.shape[0] >= n - k:
+#         print(count_inc_seq(sigma, k, n))
+#         print(P, Q)
 
 #        print([sigma(i) for i in range(1, n+1)])
  

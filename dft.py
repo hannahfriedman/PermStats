@@ -101,6 +101,9 @@ def inverse_dft(mats: list, n: int) -> list:
         result.append(round(entry, 10))
     return result
 
+
+              
+
 def inverse_dft_natural(mats: list, n: int) -> list:
     n_fac = math.factorial(n)
     reps = matrix_rep_natural(n)
@@ -501,3 +504,4 @@ def remove_dubs(partition: list) -> list:
         if part not in result:
             result.append(part)
     return result
+

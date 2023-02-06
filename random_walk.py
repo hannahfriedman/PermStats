@@ -314,6 +314,8 @@ def wij_rep(i: int, j: int, n: int) -> np.array:
                     mat[row, col] = math.factorial(n-2)
     return mat
 
+print(rep('exced', 4, False))
+
 # n = 3
 # mat = sum([wij_rep(i, i, n) for i in range(1, n+1)])/math.factorial(n)
 
@@ -329,6 +331,18 @@ def wij_rep(i: int, j: int, n: int) -> np.array:
 # plt.ylabel("Variation Distance")
 # plt.xlabel("Number of Steps")
 # plt.show()
+
+n = 5
+k = 20
+y = random_walk(perm_stats.lis, k, n)
+x = [i for i in range(1, k+1)]
+plt.yscale("log")
+plt.scatter(x,y)
+plt.title("Longest Increasing Subsequence")
+plt.ylabel("Variation Distance")
+plt.xlabel("Number of Steps")
+plt.savefig('lis_rw.eps')
+plt.show()
 
  
 # k = 20
